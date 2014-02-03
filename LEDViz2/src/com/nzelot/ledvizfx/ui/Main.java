@@ -2,6 +2,7 @@ package com.nzelot.ledvizfx.ui;
 
 import java.awt.Color;
 
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
@@ -27,6 +28,14 @@ import com.nzelot.ledvizfx.ui.elements.Text;
 import com.nzelot.ledvizfx.ui.fx.Painter;
 
 public class Main{
+
+    /** time at last frame */
+    static long lastFrame;
+
+    /** frames per second */
+    static int fps;
+    /** last fps time */
+    static long lastFPS;
 
     public static void main(String[] args) throws Exception {
 
@@ -73,8 +82,13 @@ public class Main{
 
 	boolean run = true;
 	int inputDelay = 0;
+	
+	getDelta(); // call once before loop to initialise lastFrame
+	lastFPS = getTime(); // call before loop to initialise fps timer
 
 	while(run){
+	    getDelta();
+	    
 	    if (Display.isCloseRequested() || Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
 		run = false;
 	    }
@@ -99,7 +113,7 @@ public class Main{
 		list.increseSelectedIdx();
 		inputDelay = 3;
 	    }
-	    
+
 	    if(Keyboard.isKeyDown(Keyboard.KEY_UP) && inputDelay == 0){
 		list.decreaseSelectedIdx();
 		inputDelay = 3;
@@ -110,7 +124,7 @@ public class Main{
 		    player.load(list.getSelection());
 		    METAData meta = player.getMetaData();
 		    text.setText(  (meta.getTitle().isEmpty() ? meta.getFileName() : (meta.getTitle() + (meta.getArtist().isEmpty() ? "" : (" by " + meta.getArtist() + (meta.getAlbum().isEmpty() ? "" : " from " + meta.getAlbum()) ) ) ))  );
-		    
+
 		    if(meta.getAlbumCover() != null){
 			matrix.setColor(ColorGenerator.generate(MATRIX_WIDTH, MATRIX_HEIGTH, meta.getAlbumCover()));
 		    }else{
@@ -130,6 +144,8 @@ public class Main{
 	    progress.setProgress((player.getPosition()+0d) / player.getDuration());
 
 	    painter.repaint();
+	    
+	    updateFPS(); // update FPS Counter
 
 	    Display.update();
 	    Display.sync(60);
@@ -145,5 +161,40 @@ public class Main{
     public static Color parseColor(){
 	String[] in = Settings.getItem("LEDBaseColor").split(",");
 	return new Color(Integer.parseInt(in[0]), Integer.parseInt(in[1]), Integer.parseInt(in[2]));	
+    }
+
+    /** 
+     * Calculate how many milliseconds have passed 
+     * since last frame.
+     * 
+     * @return milliseconds passed since last frame 
+     */
+    public static int getDelta() {
+	long time = getTime();
+	int delta = (int) (time - lastFrame);
+	lastFrame = time;
+
+	return delta;
+    }
+
+    /**
+     * Get the accurate system time
+     * 
+     * @return The system time in milliseconds
+     */
+    public static long getTime() {
+	return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+    }
+
+    /**
+     * Calculate the FPS and set it in the title bar
+     */
+    public static void updateFPS() {
+	if (getTime() - lastFPS > 1000) {
+	    Display.setTitle("FPS: " + fps);
+	    fps = 0;
+	    lastFPS += 1000;
+	}
+	fps++;
     }
 }
