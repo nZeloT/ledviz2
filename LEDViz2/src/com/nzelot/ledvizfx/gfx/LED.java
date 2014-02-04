@@ -1,17 +1,10 @@
 package com.nzelot.ledvizfx.gfx;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glDisable;
-
 import java.awt.Color;
 
-import com.nzelot.ledvizfx.ui.fx.DrawUtils;
-import com.nzelot.ledvizfx.ui.fx.Drawable;
-
-public class LED implements Drawable{
+public class LED{
 
     public static final int ANIM_COUNT = 99;
-    private static final String BASE_LOCATION = "textures/led/";
 
     /**
      * Fields to hold the LED position
@@ -50,21 +43,6 @@ public class LED implements Drawable{
 	col = c;
     }
 
-
-    /**
-     * Draws the LED
-     */
-    public void draw(){	
-
-	glDisable(GL_TEXTURE_2D);
-
-	//Draw Background
-//	DrawUtils.drawColorRect(x, y, size, col);
-
-	//Draw LED Texture
-	DrawUtils.drawColoredTextureRect(x, y, size, size, col, BASE_LOCATION + value);
-    }
-    
     public int getX() {
 	return x;
     }

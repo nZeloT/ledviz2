@@ -2,7 +2,7 @@ package com.nzelot.ledvizfx.ui.elements;
 
 import java.awt.Color;
 
-import com.nzelot.ledvizfx.ui.fx.Drawable;
+import com.nzelot.ledviz2.gfx.core.Drawable;
 
 abstract class UIElement implements Drawable {
     

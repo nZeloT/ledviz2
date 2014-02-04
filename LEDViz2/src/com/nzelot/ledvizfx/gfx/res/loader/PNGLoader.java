@@ -1,13 +1,14 @@
 package com.nzelot.ledvizfx.gfx.res.loader;
 
+import com.nzelot.ledviz2.gfx.core.Texture;
+import com.nzelot.ledviz2.gfx.core.TextureLoader;
 import com.nzelot.ledvizfx.gfx.res.ResourceLoader;
-import com.nzelot.ledvizfx.gfx.res.TextureLoader;
 
 public class PNGLoader implements ResourceLoader {
 
     @Override
-    public Integer load(String file) {
-	Integer t = null;
+    public Texture load(String file) {
+	Texture t = null;
 	try {
 	    t = TextureLoader.loadTexture(TextureLoader.loadImage(file));
 	} catch (Exception e) {

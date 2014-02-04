@@ -1,6 +1,5 @@
 package com.nzelot.ledvizfx.ui.elements;
 
-import com.nzelot.ledvizfx.ui.fx.DrawUtils;
 
 public class PopOver extends UIElement {
     
@@ -54,10 +53,10 @@ public class PopOver extends UIElement {
 	
 	if(currentFrame <= duration/2){
 	    //increase alpha
-	    DrawUtils.drawAlphaTextureRect(x, y, width, heigth, currentFrame/(duration/2f), tex);
+	    RenderUtils.drawAlphaTextureRectangle(x, y, width, heigth, currentFrame/(duration/2f), tex);
 	}else{
 	    //Decrease alpha
-	    DrawUtils.drawAlphaTextureRect(x, y, width, heigth, 1-(currentFrame-duration/2f)/(duration/2f), tex);
+	    RenderUtils.drawAlphaTextureRectangle(x, y, width, heigth, 1-(currentFrame-duration/2f)/(duration/2f), tex);
 	}
 	
 	currentFrame++;

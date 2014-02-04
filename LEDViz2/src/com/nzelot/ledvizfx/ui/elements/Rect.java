@@ -2,8 +2,6 @@ package com.nzelot.ledvizfx.ui.elements;
 
 import java.awt.Color;
 
-import com.nzelot.ledvizfx.ui.fx.DrawUtils;
-
 public class Rect extends UIElement {
     
     private Color[] col;
@@ -42,6 +40,6 @@ public class Rect extends UIElement {
 
     @Override
     public void draw() {
-	DrawUtils.drawColorRect(x, y, width, heigth, col);
+	RenderUtils.drawColoredRactangle(x, y, width, heigth, col);
     }
 }

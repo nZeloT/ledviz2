@@ -6,8 +6,9 @@ import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
+import com.nzelot.ledviz2.gfx.core.ColorUtils;
+import com.nzelot.ledviz2.gfx.core.Painter;
 import com.nzelot.ledvizfx.config.Settings;
-import com.nzelot.ledvizfx.gfx.ColorUtils;
 import com.nzelot.ledvizfx.gfx.LED;
 import com.nzelot.ledvizfx.gfx.LEDMatrix;
 import com.nzelot.ledvizfx.gfx.res.ResourceManager;
@@ -25,7 +26,6 @@ import com.nzelot.ledvizfx.ui.elements.PopOver;
 import com.nzelot.ledvizfx.ui.elements.ProgressBar;
 import com.nzelot.ledvizfx.ui.elements.Rect;
 import com.nzelot.ledvizfx.ui.elements.Text;
-import com.nzelot.ledvizfx.ui.fx.Painter;
 
 public class Main{
 
@@ -67,7 +67,7 @@ public class Main{
 	ProgressBar progress = new ProgressBar(0, Display.getHeight()-Math.min(LEDSize, 10), Display.getWidth(), Math.min(LEDSize, 10));
 	Text text = new Text(10, Display.getHeight()-35, 20);
 	FileBrowser list = new FileBrowser(10, 10, 300, Display.getHeight()-80, "F:/Musik");
-	PopOver overlay = new PopOver(590, 310, 100, 100, 60, "textures/pause");
+	PopOver overlay = new PopOver(590, 310, 100, 100, 60, "res/textures/pause");
 
 	Visualization viz = new BarVisualization();
 	viz.init(0);
@@ -99,13 +99,13 @@ public class Main{
 		if(player.isPlaying()){
 		    player.pause();
 		    overlay.reset();
-		    overlay.setTex("textures/pause");
+		    overlay.setTex("res/textures/pause");
 		    overlay.popOut();
 		    inputDelay = KEY_TIME_OUT;
 		}else{
 		    player.play();
 		    overlay.reset();
-		    overlay.setTex("textures/play");
+		    overlay.setTex("res/textures/play");
 		    overlay.popOut();
 		    inputDelay = KEY_TIME_OUT;
 		}
@@ -142,7 +142,7 @@ public class Main{
 	    }
 
 	    viz.aplyFFTData(matrix, player.hasNewData() ? player.getSpectrumData() : null);
-
+	    
 	    progress.setProgress((player.getPosition()+0d) / player.getDuration());
 
 	    painter.repaint();

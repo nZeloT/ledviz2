@@ -2,8 +2,6 @@ package com.nzelot.ledvizfx.ui.elements;
 
 import java.text.DecimalFormat;
 
-import com.nzelot.ledvizfx.ui.fx.DrawUtils;
-
 public class ProgressBar extends UIElement{
 
     private double progress;
@@ -44,7 +42,7 @@ public class ProgressBar extends UIElement{
     @Override
     public void draw() {
 	//Progress
-	DrawUtils.drawColorRect(x, y, (int) (width*progress), heigth, bgColor);
+	RenderUtils.drawColoredRectangle(x, y, (int) (width*progress), heigth, bgColor);
 
 	//Text
 	if(showText){

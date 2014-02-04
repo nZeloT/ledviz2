@@ -3,8 +3,6 @@ package com.nzelot.ledvizfx.ui.elements;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import com.nzelot.ledvizfx.ui.fx.DrawUtils;
-
 public class List<E> extends UIElement {
 
     private ArrayList<E> entries;
@@ -92,7 +90,7 @@ public class List<E> extends UIElement {
 	    if(i >= 0 && i < entries.size()){
 		if((i-selIdx+sym) % 2 == 0 || i == selIdx){
 		    Color c = new Color(bgColor.getRed(), bgColor.getGreen(), bgColor.getBlue(), (i == selIdx ? bgColor.getAlpha() : bgColor.getAlpha()/4));
-		    DrawUtils.drawColorRect(x, y+(i-selIdx+sym)*rowHeigth, width, rowHeigth, c);
+		    RenderUtils.drawColoredRectangle(x, y+(i-selIdx+sym)*rowHeigth, width, rowHeigth, c);
 		}
 
 		txt.setX(x+10);
