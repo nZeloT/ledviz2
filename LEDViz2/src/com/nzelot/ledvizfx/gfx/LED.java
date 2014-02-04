@@ -59,10 +59,10 @@ public class LED implements Drawable{
 	glDisable(GL_TEXTURE_2D);
 
 	//Draw Background
-	DrawUtils.drawColorRect(x, y, size, col);
+//	DrawUtils.drawColorRect(x, y, size, col);
 
 	//Draw LED Texture
-	DrawUtils.drawTextureRect(x, y, size, BASE_LOCATION + value);
+	DrawUtils.drawColoredTextureRect(x, y, size, size, col, BASE_LOCATION + value);
     }
     
     public int getX() {

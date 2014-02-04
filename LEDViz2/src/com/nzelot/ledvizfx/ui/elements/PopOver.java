@@ -54,15 +54,14 @@ public class PopOver extends UIElement {
 	
 	if(currentFrame <= duration/2){
 	    //increase alpha
-	    DrawUtils.drawTextureRect(x, y, width, heigth, currentFrame/(duration/2f), tex);
+	    DrawUtils.drawAlphaTextureRect(x, y, width, heigth, currentFrame/(duration/2f), tex);
 	}else{
 	    //Decrease alpha
-	    DrawUtils.drawTextureRect(x, y, width, heigth, 1-(currentFrame-duration/2f)/(duration/2f), tex);
+	    DrawUtils.drawAlphaTextureRect(x, y, width, heigth, 1-(currentFrame-duration/2f)/(duration/2f), tex);
 	}
 	
 	currentFrame++;
 	if(currentFrame == duration)
 	    currentFrame = -1;
     }
-
 }

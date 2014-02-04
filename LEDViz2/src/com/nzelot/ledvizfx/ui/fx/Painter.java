@@ -13,7 +13,7 @@ public class Painter implements Repaint {
     
     public Painter() {
 	elements = new ArrayList<Drawable>();
-	baseColor = Color.BLACK;
+	baseColor = Color.CYAN;
     }
     
     @Override

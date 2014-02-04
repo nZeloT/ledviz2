@@ -1,9 +1,15 @@
 package com.nzelot.ledvizfx.ui.elements;
 
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV_MODE;
+import static org.lwjgl.opengl.GL11.glTexEnvi;
+
 import java.awt.Font;
 
+import org.lwjgl.opengl.GL11;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.TrueTypeFont;
+import org.newdawn.slick.opengl.TextureImpl;
 
 import com.nzelot.ledvizfx.gfx.res.ResourceManager;
 
@@ -54,7 +60,10 @@ public class Text extends UIElement {
 
     @Override
     public void draw() {
-//	DrawUtils.drawText(x, y, text, font, fgColor);
+	GL11.glEnable(GL11.GL_TEXTURE_2D);
+	TextureImpl.unbind();
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
 	ttf.drawString(x, y, text, new Color(fgColor.getRed(), fgColor.getGreen(), fgColor.getBlue()));
+	GL11.glDisable(GL11.GL_TEXTURE_2D);
     }
 }

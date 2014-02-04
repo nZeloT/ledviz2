@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-public class ColorGenerator {
+public class ColorUtils {
 
     public static Color[][] generate(int w, int h, BufferedImage img){
 	Color[][] ret = new Color[h][w];

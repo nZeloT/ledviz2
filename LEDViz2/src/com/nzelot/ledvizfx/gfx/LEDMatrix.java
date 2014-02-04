@@ -69,6 +69,16 @@ public class LEDMatrix implements Drawable {
 	    for(int j = 0; j < width; j++)
 		matrix[i][j].setCol(colors[i][j]);
     }
+    
+    public Color[][] getColor(){
+	Color[][] colors = new Color[heigth][width];
+
+	for(int i = 0; i < heigth; i++)
+	    for(int j = 0; j < width; j++)
+		colors[i][j] = matrix[i][j].getCol();
+	
+	return colors;
+    }
 
     private void initMatrix() {
 	matrix = new LED[heigth][width];

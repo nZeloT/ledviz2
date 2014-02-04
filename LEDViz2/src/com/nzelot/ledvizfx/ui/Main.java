@@ -7,7 +7,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 import com.nzelot.ledvizfx.config.Settings;
-import com.nzelot.ledvizfx.gfx.ColorGenerator;
+import com.nzelot.ledvizfx.gfx.ColorUtils;
 import com.nzelot.ledvizfx.gfx.LED;
 import com.nzelot.ledvizfx.gfx.LEDMatrix;
 import com.nzelot.ledvizfx.gfx.res.ResourceManager;
@@ -44,6 +44,8 @@ public class Main{
 	final int LEDSize        = Integer.parseInt(Settings.getItem("LEDSize"));
 	final boolean FULL_SREEN = Boolean.parseBoolean(Settings.getItem("Fullscreen"));
 	final Color LEDBASECOLOR = parseColor();
+	final int TARGET_FPS     = Integer.parseInt(Settings.getItem("TargetFPS"));
+	final int KEY_TIME_OUT   = Integer.parseInt(Settings.getItem("KeyTimeOut"));
 
 	LWJGL.init(MATRIX_WIDTH*LEDSize, MATRIX_HEIGTH*LEDSize, FULL_SREEN);
 
@@ -99,24 +101,24 @@ public class Main{
 		    overlay.reset();
 		    overlay.setTex("textures/pause");
 		    overlay.popOut();
-		    inputDelay = 3;
+		    inputDelay = KEY_TIME_OUT;
 		}else{
 		    player.play();
 		    overlay.reset();
 		    overlay.setTex("textures/play");
 		    overlay.popOut();
-		    inputDelay = 3;
+		    inputDelay = KEY_TIME_OUT;
 		}
 	    }
 
 	    if(Keyboard.isKeyDown(Keyboard.KEY_DOWN) && inputDelay == 0){
 		list.increseSelectedIdx();
-		inputDelay = 3;
+		inputDelay = KEY_TIME_OUT;
 	    }
 
 	    if(Keyboard.isKeyDown(Keyboard.KEY_UP) && inputDelay == 0){
 		list.decreaseSelectedIdx();
-		inputDelay = 3;
+		inputDelay = KEY_TIME_OUT;
 	    }
 
 	    if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT) && inputDelay == 0){
@@ -126,7 +128,7 @@ public class Main{
 		    text.setText(  (meta.getTitle().isEmpty() ? meta.getFileName() : (meta.getTitle() + (meta.getArtist().isEmpty() ? "" : (" by " + meta.getArtist() + (meta.getAlbum().isEmpty() ? "" : " from " + meta.getAlbum()) ) ) ))  );
 
 		    if(meta.getAlbumCover() != null){
-			matrix.setColor(ColorGenerator.generate(MATRIX_WIDTH, MATRIX_HEIGTH, meta.getAlbumCover()));
+			matrix.setColor(ColorUtils.generate(MATRIX_WIDTH, MATRIX_HEIGTH, meta.getAlbumCover()));
 		    }else{
 			matrix.setColor(LEDBASECOLOR);
 		    }
@@ -136,7 +138,7 @@ public class Main{
 		}else{
 		    list.enterDir();
 		}
-		inputDelay = 3;
+		inputDelay = KEY_TIME_OUT;
 	    }
 
 	    viz.aplyFFTData(matrix, player.hasNewData() ? player.getSpectrumData() : null);
@@ -148,7 +150,7 @@ public class Main{
 	    updateFPS(); // update FPS Counter
 
 	    Display.update();
-	    Display.sync(60);
+	    Display.sync(TARGET_FPS);
 
 	    if(inputDelay > 0)
 		inputDelay--;

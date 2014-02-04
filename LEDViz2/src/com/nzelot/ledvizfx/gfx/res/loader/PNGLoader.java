@@ -1,20 +1,15 @@
 package com.nzelot.ledvizfx.gfx.res.loader;
 
-import java.io.FileInputStream;
-
-import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
-
 import com.nzelot.ledvizfx.gfx.res.ResourceLoader;
+import com.nzelot.ledvizfx.gfx.res.TextureLoader;
 
 public class PNGLoader implements ResourceLoader {
 
     @Override
-    public Texture load(String file) {
-	Texture t = null;
+    public Integer load(String file) {
+	Integer t = null;
 	try {
-	    t = TextureLoader.getTexture("PNG", new FileInputStream(file), GL11.GL_NEAREST);
+	    t = TextureLoader.loadTexture(TextureLoader.loadImage(file));
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
