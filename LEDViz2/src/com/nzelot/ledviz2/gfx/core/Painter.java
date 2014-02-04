@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import org.lwjgl.opengl.Display;
 
-import com.nzelot.ledvizfx.ui.elements.RenderUtils;
+import com.nzelot.ledviz2.ui.elements.RenderUtils;
 
 public class Painter{
     private ArrayList<Drawable> elements;

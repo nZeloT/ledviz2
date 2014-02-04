@@ -4,7 +4,7 @@ import static org.lwjgl.opengl.GL11.glColor4f;
 
 import java.awt.Color;
 
-import com.nzelot.ledvizfx.gfx.res.ResourceManager;
+import com.nzelot.ledviz2.gfx.res.ResourceManager;
 
 public class Sprite {
 
