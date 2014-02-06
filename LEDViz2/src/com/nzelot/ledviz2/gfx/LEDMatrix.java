@@ -40,11 +40,13 @@ public class LEDMatrix implements Drawable {
 
     @Override
     public void draw() {
+	sprite.beginRender();
 	for(int i = 0; i < heigth; i++){
 	    for(int j = 0; j < width; j++){
 		sprite.renderFrame(matrix[i][j].getX(), matrix[i][j].getY(), ledSize, matrix[i][j].getValue(), matrix[i][j].getCol());
 	    }
 	}
+	sprite.endRender();
     }
 
     public LED[][] getMatrix() {
