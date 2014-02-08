@@ -26,49 +26,42 @@ public class BarVisualization implements Visualization {
 	float y = 0;
 
 	//Logarithmic, acumulate & average bins
-	if(newData != null && newData.length > 0 && newData[0] != null){
-	    
-	    int b0 = 0;
-	    int cols = matrix.getMatrix()[0].length;
-	    int rowsV = matrix.getMatrix().length;
+	int b0 = 0;
+	int cols = matrix.getMatrix()[0].length;
+	int rowsV = matrix.getMatrix().length;
 
-	    for(int x = 0; x < cols; x++) {
-		int b1 = (int)Math.pow(2, x*10.0/(cols-1));
-		if(b1 > 1023) {
-		    b1 = 1023;
-		}
-		if(b1 <= b0) {
-		    b1 = b0+1;		//Make sure it uses at least 1 FFT bin
-		}
-
-		int sc = 10+b1-b0;
-
-		float sum = 0;
-		for(; b0 < b1; b0++) {
-		    sum += newData[0][1+b0]-minValue;
-		}
-
-		y = (float)( (Math.sqrt(sum/Math.log10(sc))*1.5f*rowsV) );	//Scale it
-
-		if(y < 0)
-		    y = 0;
-		if(y > rowsV) {
-		    y = rowsV;//Cap it
-		}
-
-		fftHistory[rotator][x] = 2*y;
-
-		setBarValue(matrix, x, average(x));
-		
-		rotator++;
-		
-		if(rotator >= HISTORY_SIZE)
-		    rotator = 0;
+	for(int x = 0; x < cols; x++) {
+	    int b1 = (int)Math.pow(2, x*10.0/(cols-1));
+	    if(b1 > 1023) {
+		b1 = 1023;
 	    }
-	}else{
-	    for(int i = 0; i < matrix.getMatrix()[0].length; i++){
-		setBarValue(matrix, i, average(i));
+	    if(b1 <= b0) {
+		b1 = b0+1;		//Make sure it uses at least 1 FFT bin
 	    }
+
+	    int sc = 10+b1-b0;
+
+	    float sum = 0;
+	    for(; b0 < b1; b0++) {
+		sum += newData[0][1+b0]-minValue;
+	    }
+
+	    y = (float)( (Math.sqrt(sum/Math.log10(sc))*1.5f*rowsV) );	//Scale it
+
+	    if(y < 0)
+		y = 0;
+	    if(y > rowsV) {
+		y = rowsV;//Cap it
+	    }
+
+	    fftHistory[rotator][x] = 2*y;
+
+	    setBarValue(matrix, x, average(x));
+
+	    rotator++;
+
+	    if(rotator >= HISTORY_SIZE)
+		rotator = 0;
 	}
     }
 

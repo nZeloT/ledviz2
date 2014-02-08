@@ -19,6 +19,9 @@ import java.nio.FloatBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jouvieje.bass.Bass;
 import jouvieje.bass.BassInit;
 import jouvieje.bass.defines.BASS_POS;
@@ -32,6 +35,8 @@ import com.nzelot.ledviz2.sound.meta.METADataFetcher;
 import com.nzelot.ledviz2.sound.meta.fetcher.JAudioTaggerFetcher;
 
 public class BASSPlayer extends Player {
+    
+    private final Logger l = LoggerFactory.getLogger(BASSPlayer.class);
 
     private int chan;
 
@@ -48,7 +53,7 @@ public class BASSPlayer extends Player {
 	try {
 	    BassInit.loadLibraries();
 	} catch(BassException e) {
-	    e.printStackTrace();
+	    l.error("Could not load Libraries!", e);
 	    System.exit(1);
 	}
 
@@ -56,18 +61,18 @@ public class BASSPlayer extends Player {
 	 * Checking NativeBass version
 	 */
 	if(BassInit.NATIVEBASS_LIBRARY_VERSION() != BassInit.NATIVEBASS_JAR_VERSION()) {
-	    System.out.println("Different BASS Versions!");
+	    l.error("Different BASS Versions!");
 	    System.exit(1);
 	}
 
 	// check the correct BASS was loaded
 	if(((BASS_GetVersion() & 0xFFFF0000) >> 16) != BassInit.BASSVERSION()) {
-	    System.out.println("An incorrect version of BASS.DLL was loaded");
+	    l.error("An incorrect version of BASS.DLL was loaded");
 	    return false;
 	}
 
 	if(!BASS_Init(-1, 44100, 0, null, null)) {
-	    System.out.println("Can't initialize device");
+	    l.error("Can't initialize device");
 	    exit();
 	    return false;
 	}
@@ -79,6 +84,8 @@ public class BASSPlayer extends Player {
 	loaded = false;
 	playing = false;
 	hasNewData = false;
+	
+	l.debug("Initialized BASSPlayer!");
 
 	return true;
     }
@@ -86,6 +93,7 @@ public class BASSPlayer extends Player {
     public boolean exit(){
 	stop();
 	BASS_Free();
+	l.debug("Exited");
 	return true;
     }
 
@@ -100,13 +108,16 @@ public class BASSPlayer extends Player {
 
 	if((stream = BASS_StreamCreateFile(false, path, 0, 0, BASS_SAMPLE_LOOP)) == null
 		&&  (music = BASS_MusicLoad(false, path, 0, 0, BASS_MUSIC_RAMP | BASS_SAMPLE_LOOP, 0)) == null) {
-	    System.out.println("Can't play file");
+	    l.error("Can't play file");
 	    return false; // Can't load the file
 	}
 
 	chan = (stream != null) ? stream.asInt() : ((music != null) ?  music.asInt() : 0);
 
 	loaded = true;
+	
+	l.debug("Loaded " + path);
+	
 	return true;
     }
 

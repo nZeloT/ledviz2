@@ -5,9 +5,16 @@ import java.io.FileInputStream;
 
 
 
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.nzelot.ledviz2.gfx.res.ResourceLoader;
 
 public class TTFLoader implements ResourceLoader {
+    
+    private final Logger l = LoggerFactory.getLogger(TTFLoader.class);
 
     @Override
     public Font load(String file) {
@@ -16,7 +23,7 @@ public class TTFLoader implements ResourceLoader {
 	try {
 	    f = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(file));
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    l.error("Could not load resource: " + file, e);
 	}
     
 	return f;

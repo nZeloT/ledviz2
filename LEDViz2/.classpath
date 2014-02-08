@@ -32,8 +32,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/lwjgl/jar/slick.jar"/>
-	<classpathentry kind="lib" path="lib/sfl4j/slf4j-api-1.6.4.jar"/>
-	<classpathentry kind="lib" path="lib/sfl4j/slf4j-nop-1.6.4.jar"/>
+	<classpathentry kind="lib" path="lib/sfl4j/slf4j-api-1.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/sfl4j/slf4j-simple-1.7.6.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

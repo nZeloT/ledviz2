@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * The ResourceLoader automatically loads all files from all sub-packages.<br>
  * The Resources are accessible through a HashMap.<br>
@@ -12,6 +15,8 @@ import java.util.Map.Entry;
  *
  */
 public class ResourceManager {
+    
+    private final Logger l = LoggerFactory.getLogger(ResourceManager.class);
 
     /**
      * The instance of the Singleton
@@ -122,11 +127,11 @@ public class ResourceManager {
 
 			if(data != null){
 			    resources.put(key, new Resource(data));
-			    System.out.println("Loaded: " + resources.get(key).getType().getCanonicalName() + " " + key);
+			    l.debug("Loaded: " + resources.get(key).getType().getCanonicalName() + " " + key);
 			}
 
 		    }else{
-			System.err.println("Could not load Resource!\n"
+			l.error("Could not load Resource!\n"
 				+ "Key: " + key + " already exists!");
 		    }
 		}

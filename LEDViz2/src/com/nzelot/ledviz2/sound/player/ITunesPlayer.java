@@ -15,6 +15,9 @@ import java.nio.FloatBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jouvieje.bass.Bass;
 import jouvieje.bass.BassInit;
 import jouvieje.bass.callbacks.RECORDPROC;
@@ -32,6 +35,8 @@ import com.nzelot.ledviz2.sound.meta.METADataFetcher;
 import com.nzelot.ledviz2.sound.meta.fetcher.ITunesTagFetcher;
 
 public class ITunesPlayer extends Player {
+    
+    private final Logger l = LoggerFactory.getLogger(ITunesPlayer.class);
 
     private IiTunes itunes;
 
@@ -58,7 +63,7 @@ public class ITunesPlayer extends Player {
 	try {
 	    BassInit.loadLibraries();
 	} catch(BassException e) {
-	    e.printStackTrace();
+	    l.error("Could not load Libraries!", e);
 	    System.exit(1);
 	}
 
@@ -66,19 +71,19 @@ public class ITunesPlayer extends Player {
 	 * Checking NativeBass version
 	 */
 	if(BassInit.NATIVEBASS_LIBRARY_VERSION() != BassInit.NATIVEBASS_JAR_VERSION()) {
-	    System.out.println("Different BASS Versions!");
+	    l.error("Different BASS Versions!");
 	    System.exit(1);
 	}
 
 	// check the correct BASS was loaded
 	if(((BASS_GetVersion() & 0xFFFF0000) >> 16) != BassInit.BASSVERSION()) {
-	    System.out.println("An incorrect version of BASS.DLL was loaded");
+	    l.error("An incorrect version of BASS.DLL was loaded");
 	    return false;
 	}
 
 	// initialize BASS recording (default device)
 	if(!BASS_RecordInit(-1)) {
-	    System.out.println("Can't initialize device");
+	    l.error("Can't initialize device");
 	    stop();
 	}
 
@@ -91,6 +96,8 @@ public class ITunesPlayer extends Player {
 	loaded = false;
 	playing = false;
 	hasNewData = false;
+	
+	l.debug("Initialized ITunesPlayer!");
 
 	return true;
     }
@@ -108,7 +115,7 @@ public class ITunesPlayer extends Player {
     protected boolean load() {
 	HRECORD c = BASS_RecordStart(44100, 1, BASS_SAMPLE.BASS_SAMPLE_FLOAT | BASS_RECORD.BASS_RECORD_PAUSE, duffRecording, null);
 	if(c == null) {
-	    System.out.println("Can't start recording");
+	    l.error("Can't start recording");
 	    stop();
 	}
 	
