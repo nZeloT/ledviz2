@@ -2,20 +2,24 @@ package com.nzelot.ledviz2.ui;
 
 import java.util.ArrayList;
 
-import com.nzelot.ledviz2.gfx.core.Drawable;
+import com.nzelot.ledviz2.ui.elements.UIElement;
 
-public class UI implements Drawable {
+public class Layer {
 
     private boolean visible;
 
-    private ArrayList<Layer> elements;
+    private ArrayList<UIElement> elements;
 
-    public UI() {
+    public Layer() {
 	visible = true;
-	elements = new ArrayList<Layer>();
+	elements = new ArrayList<UIElement>();
     }
     
-    @Override
+    public Layer(UIElement... e){
+	this();
+	addElements(e);
+    }
+    
     public void draw() {
 	if(!visible)
 	    return;
@@ -25,26 +29,19 @@ public class UI implements Drawable {
 	    elements.get(i).draw();
     }
 
-    public void addElements(Layer... e){
+    public void addElements(UIElement... e){
 	if(e != null && e.length > 0){
 	    for(int i = 0; i < e.length; i++)
 		elements.add(e[i]);
 	}
     }
 
-    public ArrayList<Layer> getElements() {
+    public ArrayList<UIElement> getElements() {
 	return elements;
     }
 
-    public void setElements(ArrayList<Layer> elements) {
+    public void setElements(ArrayList<UIElement> elements) {
 	this.elements = elements;
-    }
-    
-    public Layer getLayer(int idx){
-	if(idx > -1 && idx < elements.size())
-	    return elements.get(idx);
-	else
-	    return null;
     }
 
     public boolean isVisible() {

@@ -2,6 +2,8 @@ package com.nzelot.ledviz2.ui.elements;
 
 import java.awt.Color;
 
+import com.nzelot.ledviz2.ui.utils.RenderUtils;
+
 public class Rect extends UIElement {
     
     private Color[] col;

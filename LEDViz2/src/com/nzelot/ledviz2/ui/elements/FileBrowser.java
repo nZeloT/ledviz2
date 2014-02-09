@@ -12,11 +12,15 @@ public class FileBrowser extends UIElement {
 
     private String curDirPath;
 
-    public FileBrowser(int x, int y, int width, int heigth, String startPath) {
+    private FileFilter filter;
+
+    public FileBrowser(int x, int y, int width, int heigth, String startPath, FileFilter filter) {
 	super(x, y, width, heigth);
 
-	content = new List<String>(x, y+20, width, heigth-20, 15);
+	content = new List<String>(x, y+40, width, heigth-40, 15);
 	currentDir = new Text(x, y, 18);
+
+	this.filter = filter;
 
 	enterDir(startPath);
     }
@@ -73,11 +77,11 @@ public class FileBrowser extends UIElement {
 		    files.add(s.getName());
 	    }
 
-	    for(String s : dirs)
-		content.addEntries(s);
+	    content.addEntries(dirs.toArray(new String[0]));
 
 	    for(String s : files)
-		content.addEntries(s);
+		if(filter.check(s.substring(s.lastIndexOf(".")+1)))
+		    content.addEntries(s);
 
 	    currentDir.setText(dir.replace("\\", "/"));
 	    curDirPath = f.getAbsolutePath();
@@ -117,5 +121,44 @@ public class FileBrowser extends UIElement {
     public void draw() {
 	currentDir.draw();
 	content.draw();
+    }
+
+    public FileFilter getFilter() {
+	return filter;
+    }
+
+    public void setFilter(FileFilter filter) {
+	this.filter = filter;
+    }
+
+    public static class FileFilter {
+	public static final FileFilter NO_FILTER = new FileFilter(){
+	    public boolean check(String end) {
+		return true;
+	    };
+	};
+	
+	private String filter;
+	
+	private FileFilter(){}
+
+	public FileFilter(String... end) {
+	    filter = "";
+	    addEnd(end);
+	}
+
+	public void addEnd(String... end){
+	    if(end != null && end.length > 0)
+		for(String s : end)
+		    filter += s + ";";
+	}
+
+	public String[] getEnds(){
+	    return filter.split(";");
+	}
+
+	public boolean check(String end){
+	    return filter.contains(end);
+	}
     }
 }

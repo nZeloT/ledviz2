@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import com.nzelot.ledviz2.gfx.LED;
 import com.nzelot.ledviz2.gfx.LEDMatrix;
 import com.nzelot.ledviz2.gfx.core.ColorUtils;
+import com.nzelot.ledviz2.gfx.core.GLFont;
 import com.nzelot.ledviz2.gfx.core.LWJGL;
 import com.nzelot.ledviz2.gfx.core.Painter;
+import com.nzelot.ledviz2.gfx.core.TextureLoader;
 import com.nzelot.ledviz2.gfx.res.ResourceManager;
 import com.nzelot.ledviz2.gfx.res.loader.CLASSLoader;
 import com.nzelot.ledviz2.gfx.res.loader.JAVALoader;
@@ -24,16 +27,18 @@ import com.nzelot.ledviz2.gfx.viz.Visualization;
 import com.nzelot.ledviz2.sound.Player;
 import com.nzelot.ledviz2.sound.meta.METAData;
 import com.nzelot.ledviz2.sound.player.BASSPlayer;
+import com.nzelot.ledviz2.ui.Layer;
 import com.nzelot.ledviz2.ui.UI;
 import com.nzelot.ledviz2.ui.elements.FileBrowser;
 import com.nzelot.ledviz2.ui.elements.PopOver;
 import com.nzelot.ledviz2.ui.elements.ProgressBar;
 import com.nzelot.ledviz2.ui.elements.Rect;
 import com.nzelot.ledviz2.ui.elements.Text;
+import com.nzelot.ledviz2.ui.elements.FileBrowser.FileFilter;
 import com.nzelot.ledviz2.utils.FPSCounter;
 
 public class LEDViz2{
-    
+
     private final Logger l = LoggerFactory.getLogger(LEDViz2.class);
 
     private int MATRIX_WIDTH;
@@ -46,11 +51,16 @@ public class LEDViz2{
     private int TARGET_FPS;
 
     private int KEY_TIME_OUT;
+    private int MOUSE_KEY_OUT;
+    private int MOUSE_HIDE_OUT;
 
     private String START_PATH;
 
 
-    private int inputDelay;
+    private int keyboardDelay;
+    private int mouseDelay;
+
+    private int mouseHideDelay;
 
     private Player player;
 
@@ -66,7 +76,7 @@ public class LEDViz2{
     private FPSCounter fps;
 
     public static void main(String[] args) throws Exception {
-	
+
 	System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
 
 	ResourceManager.addLoader("png", new PNGLoader());
@@ -100,6 +110,8 @@ public class LEDViz2{
 
 	l.debug("Exiting ...");
 	player.exit();
+	GLFont.unloadFonts();
+	TextureLoader.unloadTextures();
 	Display.destroy();
     }
 
@@ -129,20 +141,20 @@ public class LEDViz2{
 
 	fps = new FPSCounter();
 
-	inputDelay = 0;
-	
+	keyboardDelay = 0;
+
 	Keyboard.enableRepeatEvents(true);
     }
 
     private void initVariables(){
 	Properties s = new Properties();
-	
+
 	try {
 	    s.load(new FileInputStream("settings.properties"));
 	} catch (Exception e) {
 	    l.error("Could not load Settingsfile!", e);
 	}
-	
+
 	MATRIX_WIDTH   = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.MatrixWidth", "64"));
 	MATRIX_HEIGTH  = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.MatrixHeigth", "36"));
 	LEDSize        = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.LEDSize", "20"));
@@ -151,8 +163,9 @@ public class LEDViz2{
 	LEDBASECOLOR   = new Color(Integer.parseInt(in[0]), Integer.parseInt(in[1]), Integer.parseInt(in[2]));
 	TARGET_FPS     = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.TargetFPS", "60"));
 	KEY_TIME_OUT   = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.KeyTimeOut", "5"));
-	START_PATH     = s.getProperty("org.nZeloT.ledviz2.StartPath", "F:/Musik");
-	
+	MOUSE_KEY_OUT  = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.MouseTimeOut", "5"));
+	MOUSE_HIDE_OUT = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.MouseHideTimeOut", "60"));
+	START_PATH     = s.getProperty("org.nZeloT.ledviz2.StartPath", System.getProperty("user.dir"));
     }
 
     private void initUI(){
@@ -160,18 +173,34 @@ public class LEDViz2{
 
 	Rect shadow = new Rect(0, Display.getHeight()-60, Display.getWidth(), 60, new Color[]{new Color(0, 0, 0, 0), new Color(0,0,0,0), Color.BLACK, Color.BLACK});
 	progress = new ProgressBar(0, Display.getHeight()-Math.min(LEDSize, 10), Display.getWidth(), Math.min(LEDSize, 10));
-	text = new Text(10, Display.getHeight()-35, 20);
-	list = new FileBrowser(10, 10, 350, Display.getHeight()-80, START_PATH);
+	text = new Text(10, Display.getHeight()-60, 20);
+	list = new FileBrowser(10, 5, 350, Display.getHeight()-80, START_PATH, new FileBrowser.FileFilter("mp3", "mp4", "m4a"));
 	overlay = new PopOver((Display.getWidth()-100)/2, (Display.getHeight()-100)/2, 100, 100, 60, "res/textures/pause");
 
-	ui.addElements(shadow, progress, text, list, overlay);
+	ui.addElements(new Layer(shadow, progress, text, overlay), new Layer(list));
     }
 
     private void handleInput(){
-	if(inputDelay == 0){
+
+	if(Mouse.getDX() < 3 && Mouse.getDY() < 3){
+	    mouseHideDelay++;
+
+	    if(mouseHideDelay == MOUSE_HIDE_OUT){
+		mouseHideDelay = 0;
+		Mouse.setGrabbed(true);
+		ui.setVisible(false);
+	    }
+	}else{
+	    mouseHideDelay = 0;
+	    Mouse.setGrabbed(false);
+	    ui.setVisible(true);
+	}
+
+	if(keyboardDelay == 0){
 	    while(Keyboard.next()){
 		int next = Keyboard.getEventKey();
 		if(Keyboard.getEventKeyState()){
+		    ui.setVisible(true);
 		    switch(next){
 		    case Keyboard.KEY_SPACE:
 			if(player.isPlaying()){
@@ -188,15 +217,17 @@ public class LEDViz2{
 			break;
 
 		    case Keyboard.KEY_DOWN:
-			list.increseSelectedIdx();
+			if(ui.getLayer(1).isVisible())
+			    list.increseSelectedIdx();
 			break;
 
 		    case Keyboard.KEY_UP:
-			list.decreaseSelectedIdx();
+			if(ui.getLayer(1).isVisible())
+			    list.decreaseSelectedIdx();
 			break;
 
 		    case Keyboard.KEY_RIGHT:
-			if(list.isFileSelected()){
+			if(ui.getLayer(1).isVisible() && list.isFileSelected()){
 			    player.load(list.getSelection());
 			    METAData meta = player.getMetaData();
 			    text.setText(  (meta.getTitle().isEmpty() ? meta.getFileName() : (meta.getTitle() + (meta.getArtist().isEmpty() ? "" : (" by " + meta.getArtist() + (meta.getAlbum().isEmpty() ? "" : " from " + meta.getAlbum()) ) ) ))  );
@@ -212,19 +243,20 @@ public class LEDViz2{
 			    list.enterDir();
 			}
 			break;
-
+			
 		    case Keyboard.KEY_TAB:
-			ui.setVisible(!ui.isVisible());
+			ui.getLayer(1).setVisible(!ui.getLayer(1).isVisible());
 			break;
 		    }
 
-		    inputDelay = KEY_TIME_OUT;
+		    keyboardDelay = KEY_TIME_OUT;
+		    mouseHideDelay = 0;
 		}
 	    }
 	}
 
-	if(inputDelay > 0)
-	    inputDelay--;
+	if(keyboardDelay > 0)
+	    keyboardDelay--;
     }
 
     private void updateColor(){

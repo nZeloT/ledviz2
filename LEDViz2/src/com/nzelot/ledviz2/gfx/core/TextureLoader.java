@@ -21,8 +21,6 @@ public class TextureLoader {
     private static final ArrayList<Texture> texIDs = new ArrayList<Texture>();
 
     public static Texture loadTexture(BufferedImage image){
-	
-	glEnable(GL_TEXTURE_RECTANGLE_EXT);
 
 	int[] pixels = new int[image.getWidth() * image.getHeight()];
 	image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
@@ -62,8 +60,6 @@ public class TextureLoader {
 	//Return the texture ID so we can bind it later again
 	Texture t = new Texture(image.getWidth(), image.getHeight(), textureID);
 	texIDs.add(t);
-	
-	glDisable(GL_TEXTURE_RECTANGLE_EXT);
 
 	return t;
     }

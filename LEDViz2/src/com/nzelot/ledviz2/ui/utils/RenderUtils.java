@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.ui.elements;
+package com.nzelot.ledviz2.ui.utils;
 
 import java.awt.Color;
 

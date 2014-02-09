@@ -19,8 +19,16 @@ public class Sprite {
 
     private boolean begin;
 
-    public Sprite(String tex, int cols, int rows, int frameSize) {
+    public Sprite(Texture tex, int cols, int rows, int frameSize) {
 	super();
+	this.tex = tex;
+	this.cols = cols;
+	this.rows = rows;
+	this.frameSize = frameSize;
+	this.begin = false;
+    }
+    
+    public Sprite(String tex, int cols, int rows, int frameSize){
 	this.tex = ResourceManager.getResource(tex).<Texture>getData();
 	this.cols = cols;
 	this.rows = rows;
@@ -44,6 +52,10 @@ public class Sprite {
 	renderFrame(x, y, size, nr, c);
 	endRender();
     }
+    
+    public void renderFrame(int x, int y, int nr){
+	renderFrame(x, y, frameSize, nr);
+    }
 
     public void renderFrame(int x, int y, int size, int nr, Color... c){
 	if(!begin)
@@ -60,7 +72,7 @@ public class Sprite {
 	}else{
 	    s1 = frameSize * (nr % cols);
 	    t1 = frameSize * ((int)(nr / (cols+0f)));
-	    s2 = frameSize * (nr % 10 +1);
+	    s2 = frameSize * (nr % cols +1);
 	    t2 = frameSize * ((int)(nr / (cols+0f)) + 1);
 	}
 

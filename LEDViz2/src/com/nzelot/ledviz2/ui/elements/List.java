@@ -3,6 +3,8 @@ package com.nzelot.ledviz2.ui.elements;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import com.nzelot.ledviz2.ui.utils.RenderUtils;
+
 public class List<E> extends UIElement {
 
     private ArrayList<E> entries;
@@ -13,16 +15,16 @@ public class List<E> extends UIElement {
     
     private Text txt;
     
-    public List(int x, int y, int width, int heigth, int rH) {
+    public List(int x, int y, int width, int heigth, int fontSize) {
 	super(x, y, width, heigth);
 	
 	entries = new ArrayList<E>();
 	
-	rowHeigth = rH;
-	
 	selIdx = 0;
 	
-	txt = new Text(0, 0, rowHeigth);
+	txt = new Text(0, 0, fontSize);
+	
+	rowHeigth = txt.getFontRenderHeigth();
     }
     
     @SuppressWarnings("unchecked")
@@ -43,11 +45,6 @@ public class List<E> extends UIElement {
     
     public int getRowHeigth() {
 	return rowHeigth;
-    }
-    
-    public void setRowHeigth(int rowHeigth) {
-	this.rowHeigth = rowHeigth;
-	txt.setHeigth(rowHeigth);
     }
     
     public void setSelectedIdx(int selIdx) {
@@ -94,7 +91,7 @@ public class List<E> extends UIElement {
 		}
 
 		txt.setX(x+10);
-		txt.setY(y + (i-selIdx+sym)*rowHeigth-2);
+		txt.setY(y + (i-selIdx+sym-1)*rowHeigth);
 		txt.setText(entries.get(i).toString());
 		txt.draw();
 	    }

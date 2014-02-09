@@ -1,33 +1,16 @@
 package com.nzelot.ledviz2.ui.elements;
 
-import static org.lwjgl.opengl.EXTTextureRectangle.GL_TEXTURE_RECTANGLE_EXT;
-import static org.lwjgl.opengl.GL11.GL_DECAL;
-import static org.lwjgl.opengl.GL11.GL_MODULATE;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_ENV_MODE;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glTexEnvi;
-
 import java.awt.Font;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.TrueTypeFont;
-import org.newdawn.slick.opengl.TextureImpl;
-
-import com.nzelot.ledviz2.gfx.core.Texture;
+import com.nzelot.ledviz2.gfx.core.GLFont;
 import com.nzelot.ledviz2.gfx.res.ResourceManager;
 
-@SuppressWarnings("deprecation")
 public class Text extends UIElement {
     
     private String text;
     
+    private GLFont glFont;
     private Font font;
-    private TrueTypeFont ttf;
-    
-    
 
     public Text(int x, int y, int textSize) {
 	this(x, y, textSize, "");
@@ -52,8 +35,12 @@ public class Text extends UIElement {
 	return getHeigth();
     }
     
-    public void setTextsize(int s){
+    public void setTextSize(int s){
 	setHeigth(s);
+    }
+    
+    public int getFontRenderHeigth(){
+	return glFont.getHeigth();
     }
     
     @Override
@@ -61,19 +48,11 @@ public class Text extends UIElement {
         super.setHeigth(heigth);
         
         font = ResourceManager.getResource("res/fonts/simple_light").<Font>getData().deriveFont(heigth+0f);
-        ttf = new TrueTypeFont(font, true);
+        glFont = GLFont.getFont(font, fgColor);
     }
 
     @Override
     public void draw() {
-	Texture.unbind();
-	glDisable(GL_TEXTURE_RECTANGLE_EXT);
-	glEnable(GL_TEXTURE_2D);
-	TextureImpl.unbind();
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	ttf.drawString(x, y, text, new Color(fgColor.getRed(), fgColor.getGreen(), fgColor.getBlue()));
-	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_TEXTURE_RECTANGLE_EXT);
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glFont.drawString(x, y, text);
     }
 }

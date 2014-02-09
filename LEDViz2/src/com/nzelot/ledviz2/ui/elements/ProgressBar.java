@@ -2,6 +2,8 @@ package com.nzelot.ledviz2.ui.elements;
 
 import java.text.DecimalFormat;
 
+import com.nzelot.ledviz2.ui.utils.RenderUtils;
+
 public class ProgressBar extends UIElement{
 
     private double progress;
