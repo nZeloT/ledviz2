@@ -6,9 +6,9 @@ import com.nzelot.ledviz2.gfx.core.GLFont;
 import com.nzelot.ledviz2.gfx.res.ResourceManager;
 
 public class Text extends UIElement {
-    
+
     private String text;
-    
+
     private GLFont glFont;
     private Font font;
 
@@ -18,37 +18,33 @@ public class Text extends UIElement {
 
     public Text(int x, int y, int textSize, String text) {
 	super(x, y, 0, textSize);
-	
-	setHeigth(textSize);
-	this.text = text;
+
+	setFontSize(textSize);
+	setText(text);
     }
-    
+
     public String getText() {
 	return text;
     }
-    
+
     public void setText(String text) {
 	this.text = text;
     }
-    
-    public int getTextSize(){
-	return getHeigth();
-    }
-    
-    public void setTextSize(int s){
-	setHeigth(s);
-    }
-    
-    public int getFontRenderHeigth(){
-	return glFont.getHeigth();
-    }
-    
+
+    /**
+     * Unused; Does not affect anything
+     */
     @Override
-    public void setHeigth(int heigth) {
-        super.setHeigth(heigth);
-        
-        font = ResourceManager.getResource("res/fonts/simple_light").<Font>getData().deriveFont(heigth+0f);
-        glFont = GLFont.getFont(font, fgColor);
+    public void setHeigth(int heigth) {}
+
+    public int getFontSize(){
+	return glFont.getSize();
+    }
+
+    public void setFontSize(int size){
+	font = ResourceManager.getResource("res/fonts/simple_light").<Font>getData().deriveFont(size+0f);
+	glFont = GLFont.getFont(font, fgColor);
+	heigth = glFont.getHeigth();
     }
 
     @Override

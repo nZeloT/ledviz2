@@ -26,6 +26,13 @@ public class RenderUtils {
 
 	glEnable(GL_TEXTURE_RECTANGLE_EXT);
     }
+    
+    public static void drawTextureRectangle(int x, int y, int width, int heigth, String tex){
+	Texture t = ResourceManager.getResource(tex).<Texture>getData();
+	t.bind();
+	
+	DrawUtils.drawQuad(x, y, width, heigth, new int[][]{{0, t.getWidth()},{0, t.getHeigth()}});
+    }
 
     public static void drawAlphaTextureRectangle(int x, int y, int width, int heigth, float alpha, String tex){
 	Texture.unbind();

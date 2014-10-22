@@ -130,7 +130,7 @@ public class FileBrowser extends UIElement {
     public void setFilter(FileFilter filter) {
 	this.filter = filter;
     }
-
+    
     public static class FileFilter {
 	public static final FileFilter NO_FILTER = new FileFilter(){
 	    public boolean check(String end) {

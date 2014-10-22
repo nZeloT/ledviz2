@@ -22,9 +22,9 @@ public class List<E> extends UIElement {
 	
 	selIdx = 0;
 	
-	txt = new Text(0, 0, fontSize);
+	txt = new Text(x+10, y, fontSize);
 	
-	rowHeigth = txt.getFontRenderHeigth();
+	rowHeigth = txt.getHeigth();
     }
     
     @SuppressWarnings("unchecked")
@@ -74,7 +74,7 @@ public class List<E> extends UIElement {
         if(txt != null)
             txt.setFgColor(fgColor);
     }
-
+    
     @Override
     public void draw() {
 	int drawCount = (int) ((heigth+1.0f) / rowHeigth);
