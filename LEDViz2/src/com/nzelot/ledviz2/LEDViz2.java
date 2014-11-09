@@ -33,9 +33,7 @@ import com.nzelot.ledviz2.ui.elements.FileBrowser;
 import com.nzelot.ledviz2.ui.elements.ImageButton;
 import com.nzelot.ledviz2.ui.elements.PopOver;
 import com.nzelot.ledviz2.ui.elements.ProgressBar;
-import com.nzelot.ledviz2.ui.elements.Rect;
 import com.nzelot.ledviz2.ui.elements.Text;
-import com.nzelot.ledviz2.ui.elements.FileBrowser.FileFilter;
 import com.nzelot.ledviz2.utils.FPSCounter;
 
 public class LEDViz2{
@@ -59,7 +57,6 @@ public class LEDViz2{
 
 
 	private int keyboardDelay;
-	private int mouseDelay;
 
 	private int mouseHideDelay;
 
@@ -132,7 +129,6 @@ public class LEDViz2{
 		matrix.setOverallValue(LED.ANIM_COUNT-5);
 
 		viz = new BarVisualization();
-		viz.init(0);
 
 		initUI();
 

@@ -9,59 +9,65 @@ public class BarVisualization implements Visualization {
 
 	private float[][] fftHistory;
 
-	private double minValue;
-
 	private int rotator;
 
 	@Override
-	public void init(int minValue) {
-		this.minValue = minValue;
-	}
-
-	@Override
-	public void aplyFFTData(LEDMatrix matrix, float[]... newData) {
+	public void aplyFFTData(LEDMatrix matrix, float[]... newData) {		
 		if(fftHistory == null)
 			initData(matrix.getMatrix()[0].length);
-
-		float y = 0;
-
-		//Logarithmic, acumulate & average bins
-		int b0 = 0;
-		int cols = matrix.getMatrix()[0].length;
+		
 		int rowsV = matrix.getMatrix().length;
+		int cols = matrix.getMatrix()[0].length;
+		double fftBucketHeight = 0f;
+        int barHeight = 0;
+        final double minDBValue = -90;
+        final double maxDBValue = 0;
+        final double dbScale = (maxDBValue - minDBValue);
+        int[] barIndexMax = new int[cols];
+        int barIndex = 0;
+        int binsPerBar = (int) ((newData[0].length+0d)/cols);
 
-		for(int x = 0; x < cols; x++) {
-			int b1 = (int)Math.pow(2, x*10.0/(cols-1));
-			if(b1 > 1023) {
-				b1 = 1023;
-			}
-			if(b1 <= b0) {
-				b1 = b0+1;		//Make sure it uses at least 1 FFT bin
-			}
-
-			int sc = 10+b1-b0;
-
-			float sum = 0;
-			for(; b0 < b1; b0++) {
-				sum += newData[0][1+b0]-minValue;
-			}
-
-			y = (float)( (Math.sqrt(sum/Math.log10(sc))*10.0f*rowsV) );	//Scale it
-
-			if(y < 0)
-				y = 0;
-			if(y > rowsV) {
-				y = rowsV;//Cap it
-			}
-
-			fftHistory[rotator][x] = 2*y;
-
-			setBarValue(matrix, x, average(x));
-
-			rotator++;
-
-			if(rotator >= HISTORY_SIZE)
-				rotator = 0;
+        for(int i = 1; i < barIndexMax.length; i++)
+        	//Liear Bars
+//        	barIndexMax[i-1] = binsPerBar * i;
+        	
+        	//Logarithmic Bars
+        	barIndexMax[i] = (int)((1 - Math.log(cols - i)/Math.log(cols)) * newData[0].length);
+        
+		for(int i = 0; i < newData[0].length; i++){
+			
+			//Decibel
+//			double dbValue = 20 * Math.log10((double)newData[0][i]);
+//			fftBucketHeight = ((dbValue - minDBValue) / dbScale) * rowsV;
+			
+			//Sqrt
+			fftBucketHeight = (((Math.sqrt(newData[0][i])) * 2) * rowsV);
+			
+			//Linear
+//			fftBucketHeight = (newData[0][i] * 9) * rowsV;
+			
+            
+            if (barHeight < fftBucketHeight)
+                barHeight = (int)fftBucketHeight;
+            if (barHeight < 0f)
+                barHeight = 0;
+			
+            if(i == barIndexMax[barIndex]){
+            	
+            	if(barHeight > rowsV)
+            		barHeight = rowsV;
+            	if(barHeight < 0)
+            		barHeight = 0;
+            	
+            	fftHistory[rotator][barIndex] = barHeight;
+            	setBarValue(matrix, barIndex, average(barIndex));
+            	
+            	rotator = ++rotator % HISTORY_SIZE;
+            	
+            	barHeight = 0;
+            	barIndex++;
+            }
+            
 		}
 	}
 
@@ -92,4 +98,5 @@ public class BarVisualization implements Visualization {
 				fftHistory[i][j] = 0;
 		rotator = 0;
 	}
+
 }
