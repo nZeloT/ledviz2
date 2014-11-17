@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.sound.player;
+package com.nzelot.ledviz2.sound.player.standalone;
 
 import static jouvieje.bass.Bass.BASS_ChannelGetData;
 import static jouvieje.bass.Bass.BASS_ChannelPause;
@@ -9,7 +9,7 @@ import static jouvieje.bass.Bass.BASS_GetVersion;
 import static jouvieje.bass.Bass.BASS_Init;
 import static jouvieje.bass.Bass.BASS_MusicLoad;
 import static jouvieje.bass.Bass.BASS_StreamCreateFile;
-import static jouvieje.bass.defines.BASS_DATA.BASS_DATA_FFT1024;
+import static jouvieje.bass.defines.BASS_DATA.BASS_DATA_FFT2048;
 import static jouvieje.bass.defines.BASS_MUSIC.BASS_MUSIC_RAMP;
 import static jouvieje.bass.defines.BASS_SAMPLE.BASS_SAMPLE_LOOP;
 import static jouvieje.bass.utils.BufferUtils.newByteBuffer;
@@ -19,9 +19,6 @@ import java.nio.FloatBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jouvieje.bass.Bass;
 import jouvieje.bass.BassInit;
 import jouvieje.bass.defines.BASS_POS;
@@ -29,20 +26,18 @@ import jouvieje.bass.exceptions.BassException;
 import jouvieje.bass.structures.HMUSIC;
 import jouvieje.bass.structures.HSTREAM;
 
-import com.nzelot.ledviz2.sound.Player;
-import com.nzelot.ledviz2.sound.PlayerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.nzelot.ledviz2.sound.meta.METADataFetcher;
 import com.nzelot.ledviz2.sound.meta.fetcher.JAudioTaggerFetcher;
+import com.nzelot.ledviz2.sound.player.StandalonePlayer;
 
-public class BASSPlayer extends Player {
+public class BASSPlayer extends StandalonePlayer {
 
 	private final Logger l = LoggerFactory.getLogger(BASSPlayer.class);
 
 	private int chan;
-
-	public BASSPlayer() {
-		type = PlayerType.STANDALONE;
-	}
 
 	@Override
 	public boolean init(int bands, int updateInterval) {
@@ -80,10 +75,10 @@ public class BASSPlayer extends Player {
 		bufferSize = bands * SIZEOF_FLOAT;
 		buffer = newByteBuffer(bufferSize);
 
-		updInterval = updateInterval;
 		loaded = false;
 		playing = false;
 		hasNewData = false;
+		updInterval = updateInterval;
 
 		l.debug("Initialized BASSPlayer!");
 
@@ -99,9 +94,8 @@ public class BASSPlayer extends Player {
 
 	@Override
 	protected boolean load() {
-		if(loaded){
+		if(loaded)
 			stop();
-		}
 
 		HSTREAM stream = null; 
 		HMUSIC music = null;
@@ -122,10 +116,7 @@ public class BASSPlayer extends Player {
 	}
 
 	@Override
-	public void play() {
-		if(playing || !loaded)
-			return;
-
+	protected void startPlayback() {
 		BASS_ChannelPlay(chan, false);
 		playing = true;
 
@@ -140,10 +131,7 @@ public class BASSPlayer extends Player {
 	}
 
 	@Override
-	public void pause() {
-		if(!playing || !loaded)
-			return;
-
+	protected void pausePlayback() {
 		timer.cancel();
 		playing = false;
 		BASS_ChannelPause(chan);
@@ -191,7 +179,7 @@ public class BASSPlayer extends Player {
 			return;
 
 		synchronized (buffer) {
-			BASS_ChannelGetData(chan, buffer, BASS_DATA_FFT1024);	//Get the FFT data
+			BASS_ChannelGetData(chan, buffer, BASS_DATA_FFT2048);	//Get the FFT data
 			hasNewData = true;
 		}
 	}

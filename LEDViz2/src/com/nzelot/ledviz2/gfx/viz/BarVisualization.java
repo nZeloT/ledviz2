@@ -1,73 +1,91 @@
 package com.nzelot.ledviz2.gfx.viz;
 
+import java.io.FileInputStream;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.nzelot.ledviz2.LEDViz2;
 import com.nzelot.ledviz2.gfx.LED;
 import com.nzelot.ledviz2.gfx.LEDMatrix;
 
 public class BarVisualization implements Visualization {
 
+	private final Logger l = LoggerFactory.getLogger(LEDViz2.class);
+
 	private static final int HISTORY_SIZE = 10;
+
+	private static final double MIN_DB_VALUE = -90;
+	private static final double MAX_DB_VALUE = 0;
+	private static final double DB_SCALE = (MAX_DB_VALUE - MIN_DB_VALUE);
+
+	// 0 = Linear Bar dist. // 1 = log Bar dist
+	private static int barIndexDistribution;
+	// 0 = Decibel scale // 1 = sqrt scale // 2 = linear scale
+	private static int barScaleType;
 
 	private float[][] fftHistory;
 
 	private int rotator;
 
+	private int cols;
+	private int rowsV;
+
+	private int[] barIndexMax;
+
 	@Override
 	public void aplyFFTData(LEDMatrix matrix, float[]... newData) {		
 		if(fftHistory == null)
-			initData(matrix.getMatrix()[0].length);
-		
-		int rowsV = matrix.getMatrix().length;
-		int cols = matrix.getMatrix()[0].length;
-		double fftBucketHeight = 0f;
-        int barHeight = 0;
-        final double minDBValue = -90;
-        final double maxDBValue = 0;
-        final double dbScale = (maxDBValue - minDBValue);
-        int[] barIndexMax = new int[cols];
-        int barIndex = 0;
-        int binsPerBar = (int) ((newData[0].length+0d)/cols);
+			initData(matrix.getMatrix()[0].length, matrix.getMatrix().length);
 
-        for(int i = 1; i < barIndexMax.length; i++)
-        	//Liear Bars
-//        	barIndexMax[i-1] = binsPerBar * i;
-        	
-        	//Logarithmic Bars
-        	barIndexMax[i] = (int)((1 - Math.log(cols - i)/Math.log(cols)) * newData[0].length);
-        
+		double fftBucketHeight = 0f;
+		int barHeight = 0;
+		int barIndex = 0;
+
 		for(int i = 0; i < newData[0].length; i++){
+
+			switch(barScaleType){
 			
-			//Decibel
-//			double dbValue = 20 * Math.log10((double)newData[0][i]);
-//			fftBucketHeight = ((dbValue - minDBValue) / dbScale) * rowsV;
-			
-			//Sqrt
-			fftBucketHeight = (((Math.sqrt(newData[0][i])) * 2) * rowsV);
-			
-			//Linear
-//			fftBucketHeight = (newData[0][i] * 9) * rowsV;
-			
-            
-            if (barHeight < fftBucketHeight)
-                barHeight = (int)fftBucketHeight;
-            if (barHeight < 0f)
-                barHeight = 0;
-			
-            if(i == barIndexMax[barIndex]){
-            	
-            	if(barHeight > rowsV)
-            		barHeight = rowsV;
-            	if(barHeight < 0)
-            		barHeight = 0;
-            	
-            	fftHistory[rotator][barIndex] = barHeight;
-            	setBarValue(matrix, barIndex, average(barIndex));
-            	
-            	rotator = ++rotator % HISTORY_SIZE;
-            	
-            	barHeight = 0;
-            	barIndex++;
-            }
-            
+			case 0:
+				//Decibel
+				double dbValue = 20 * Math.log10((double)newData[0][i]);
+				fftBucketHeight = ((dbValue - MIN_DB_VALUE) / DB_SCALE) * rowsV;
+				break;
+
+			case 1:
+				//Sqrt
+				fftBucketHeight = (((Math.sqrt(newData[0][i])) * 2) * rowsV);
+				break;
+				
+			case 2: default:
+				//Linear
+				fftBucketHeight = (newData[0][i] * 9) * rowsV;
+				break;
+			}
+
+
+			if (barHeight < fftBucketHeight)
+				barHeight = (int)fftBucketHeight;
+			if (barHeight < 0f)
+				barHeight = 0;
+
+			if(i == barIndexMax[barIndex]){
+
+				if(barHeight > rowsV)
+					barHeight = rowsV;
+				if(barHeight < 0)
+					barHeight = 0;
+
+				fftHistory[rotator][barIndex] = barHeight;
+				setBarValue(matrix, barIndex, average(barIndex));
+
+				rotator = ++rotator % HISTORY_SIZE;
+
+				barHeight = 0;
+				barIndex++;
+			}
+
 		}
 	}
 
@@ -91,12 +109,43 @@ public class BarVisualization implements Visualization {
 		return Math.round( (val/fftHistory.length) );
 	}
 
-	private void initData(int barCount){
+	private void initData(int barCount, int rowCount){
+		Properties s = new Properties();
+
+		try {
+			s.load(new FileInputStream("settings.properties"));
+		} catch (Exception e) {
+			l.error("Could not load Settingsfile!", e);
+		}
+
+		barIndexDistribution = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.gfx.viz.barIndexDistribution", "1"));
+		barScaleType		 = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.gfx.viz.barScaleType", "1"));
+
+		if(barIndexDistribution > 1 || barIndexDistribution < 0)
+			barIndexDistribution = 1;
+
+		if(barScaleType > 2 || barScaleType < 0)
+			barScaleType = 1;
+
 		fftHistory = new float[HISTORY_SIZE][barCount];
 		for(int i = 0; i < HISTORY_SIZE; i++)
 			for(int j = 0; j < barCount; j++)
 				fftHistory[i][j] = 0;
-		rotator = 0;
-	}
 
+		rotator = 0;
+
+		rowsV = rowCount;
+		cols = barCount;
+		barIndexMax = new int[cols];
+
+		for(int i = 1; i < barIndexMax.length; i++){
+			if(barIndexDistribution == 1){
+				//Liear Bars
+				barIndexMax[i-1] = (int) ((1024.0f/cols) * i);
+			}else{
+				//Logarithmic Bars
+				barIndexMax[i] = (int)((1 - Math.log(cols - i)/Math.log(cols)) * 1024);
+			}
+		}
+	}
 }

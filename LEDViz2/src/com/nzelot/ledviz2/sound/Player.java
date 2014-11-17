@@ -1,62 +1,40 @@
 package com.nzelot.ledviz2.sound;
 
-import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.Timer;
-
 import com.nzelot.ledviz2.sound.meta.METAData;
 import com.nzelot.ledviz2.sound.meta.METADataFetcher;
 
 
 public abstract class Player {
 
-	protected static PlayerType type;
-
-	protected int updInterval;
-
-	protected Timer timer;
-
-	protected boolean loaded;
-
-	protected boolean playing;
-
-	protected ByteBuffer buffer;
-	protected int bufferSize;
-
-	protected boolean hasNewData;
-
-	private METAData meta;
-
-	protected String path;
-
-	public Player() {
-		type = PlayerType.STANDALONE;
-	}
+	protected METAData meta;
 
 	public abstract boolean init(int bands, int updateInterval);
 
 	public abstract boolean exit();
 
-	public boolean load(String url){
-		path = new File(url).getAbsolutePath();
-
-		if(load()){
-			meta = getFetcher().fetch(path);
-			return true;
-		}else
-			return false;
+	public abstract boolean load(String url);
+	protected abstract boolean load();
+	
+	public void play(){
+		if(isPlaying() || !isLoaded())
+			return;
+		startPlayback();
+	}
+	
+	protected abstract void startPlayback();
+	
+	public void pause(){
+		if(!isPlaying() || !isLoaded())
+			return;
+		pausePlayback();
 	}
 
-	protected abstract boolean load();
-
-	public abstract void play();
-
-	public abstract void pause();
+	protected abstract void pausePlayback();
 
 	public abstract void stop();
 
 	public long getDuration(){
-		if(!loaded)
+		if(!isLoaded())
 			return -1;
 		else
 			return duration();
@@ -65,7 +43,7 @@ public abstract class Player {
 	protected abstract long duration();
 
 	public long getPosition(){
-		if(!loaded)
+		if(!isLoaded())
 			return -1;
 		else
 			return position();
@@ -78,25 +56,17 @@ public abstract class Player {
 	protected abstract METADataFetcher getFetcher();
 
 	public METAData getMetaData(){
-		if(!loaded)
+		if(!isLoaded())
 			return null;
 		else
 			return meta;
 	}
 
-	public boolean hasNewData(){
-		return hasNewData;
-	}
+	public abstract boolean hasNewData();
 
-	public boolean isLoaded() {
-		return loaded;
-	}
+	public abstract boolean isLoaded();
 
-	public boolean isPlaying() {
-		return playing;
-	}
+	public abstract boolean isPlaying();
 
-	public static PlayerType playerType(){
-		return type;
-	}
+	public abstract PlayerType getPlayerType();
 }

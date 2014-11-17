@@ -26,7 +26,8 @@ import com.nzelot.ledviz2.gfx.viz.BarVisualization;
 import com.nzelot.ledviz2.gfx.viz.Visualization;
 import com.nzelot.ledviz2.sound.Player;
 import com.nzelot.ledviz2.sound.meta.METAData;
-import com.nzelot.ledviz2.sound.player.BASSPlayer;
+import com.nzelot.ledviz2.sound.player.attatched.MPDPlayer;
+import com.nzelot.ledviz2.sound.player.attatched.provider.BASSAttachedSoundProvider;
 import com.nzelot.ledviz2.ui.Layer;
 import com.nzelot.ledviz2.ui.UI;
 import com.nzelot.ledviz2.ui.elements.FileBrowser;
@@ -134,7 +135,7 @@ public class LEDViz2{
 
 		painter.addElements(matrix, ui);
 
-		player = new BASSPlayer();
+		player = new MPDPlayer(BASSAttachedSoundProvider.class);
 		player.init(1024, 25);
 
 		updateColor();
