@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.sound.player.attatched.provider;
+package com.nzelot.ledviz2.sound.player.attached.provider;
 
 import static jouvieje.bass.Bass.BASS_ChannelGetData;
 import static jouvieje.bass.Bass.BASS_Free;
@@ -23,12 +23,13 @@ import jouvieje.bass.exceptions.BassException;
 import jouvieje.bass.structures.HRECORD;
 import jouvieje.bass.utils.Pointer;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nzelot.ledviz2.sound.player.attatched.AttatchedSoundProvider;
+import com.nzelot.ledviz2.sound.player.attached.AttachedSoundProvider;
 
-public class BASSAttachedSoundProvider implements AttatchedSoundProvider {
+public class BASSAttachedSoundProvider implements AttachedSoundProvider {
 
 	protected boolean loaded;
 
@@ -51,7 +52,7 @@ public class BASSAttachedSoundProvider implements AttatchedSoundProvider {
 
 	private int chan;
 
-	public boolean init(int bands, int updateInterval) {
+	public boolean init(int updateInterval, JSONObject specific) {
 
 		/*
 		 * NativeBass Init
@@ -77,7 +78,7 @@ public class BASSAttachedSoundProvider implements AttatchedSoundProvider {
 			return false;
 		}
 
-		bufferSize = bands * SIZEOF_FLOAT;
+		bufferSize = 1024 * SIZEOF_FLOAT;
 		buffer = newByteBuffer(bufferSize);
 
 		updInterval = updateInterval;
@@ -109,31 +110,53 @@ public class BASSAttachedSoundProvider implements AttatchedSoundProvider {
 
 		loaded = true;
 		chan = stream.asInt();
-		
-		l.debug("Loaded ...");
-		
-		l.debug("Playing ...");
-		timer = new Timer("BASS Spectrum Update Timer");
 
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				update();
-			}
-		}, updInterval, updInterval);
+		l.debug("Loaded ...");
 
 		return true;
 	}
 
-	public boolean exit() {
-		if(loaded)
-			timer.cancel();
+	public boolean start(){
 		
-		l.debug("Stop");
+		if(timer == null && loaded){
+			
+			l.debug("Playing ...");
+			timer = new Timer("Attached BASS Spectrum Update Timer");
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					update();
+				}
+			}, updInterval, updInterval);
+			
+			return true;
+		}
+
+		return false;
+
+	}
+
+	public boolean stop(){
+		
+		if(timer != null && loaded){
+			l.debug("Stopping ...");
+			timer.cancel();
+			timer = null;
+			return true;
+		}
+		
+		return false;
+
+	}
+
+	public boolean exit() {
+		stop();
+
+		l.debug("Exit");
 		loaded = false;
 		BASS_RecordFree();
 		BASS_Free();
-		
+
 		return true;
 	}
 

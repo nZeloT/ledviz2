@@ -1,5 +1,7 @@
 package com.nzelot.ledviz2.sound;
 
+import org.json.JSONObject;
+
 import com.nzelot.ledviz2.sound.meta.METAData;
 import com.nzelot.ledviz2.sound.meta.METADataFetcher;
 
@@ -8,7 +10,7 @@ public abstract class Player {
 
 	protected METAData meta;
 
-	public abstract boolean init(int bands, int updateInterval);
+	public abstract boolean init(JSONObject specific);
 
 	public abstract boolean exit();
 

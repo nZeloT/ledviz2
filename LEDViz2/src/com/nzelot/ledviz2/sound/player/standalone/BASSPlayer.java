@@ -26,6 +26,7 @@ import jouvieje.bass.exceptions.BassException;
 import jouvieje.bass.structures.HMUSIC;
 import jouvieje.bass.structures.HSTREAM;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +41,8 @@ public class BASSPlayer extends StandalonePlayer {
 	private int chan;
 
 	@Override
-	public boolean init(int bands, int updateInterval) {
-
+	public boolean init(JSONObject specific) {
+		
 		/*
 		 * NativeBass Init
 		 */
@@ -72,13 +73,13 @@ public class BASSPlayer extends StandalonePlayer {
 			return false;
 		}
 
-		bufferSize = bands * SIZEOF_FLOAT;
+		bufferSize = 1024 * SIZEOF_FLOAT;
 		buffer = newByteBuffer(bufferSize);
 
 		loaded = false;
 		playing = false;
 		hasNewData = false;
-		updInterval = updateInterval;
+		updInterval = specific.optInt("updInterval", 25);
 
 		l.debug("Initialized BASSPlayer!");
 

@@ -3,6 +3,7 @@ package com.nzelot.ledviz2.gfx.viz;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,13 +37,10 @@ public class BarVisualization implements Visualization {
 
 	@Override
 	public void aplyFFTData(LEDMatrix matrix, float[]... newData) {		
-		if(fftHistory == null)
-			initData(matrix.getMatrix()[0].length, matrix.getMatrix().length);
-
 		double fftBucketHeight = 0f;
 		int barHeight = 0;
 		int barIndex = 0;
-
+		
 		for(int i = 0; i < newData[0].length; i++){
 
 			switch(barScaleType){
@@ -109,7 +107,7 @@ public class BarVisualization implements Visualization {
 		return Math.round( (val/fftHistory.length) );
 	}
 
-	private void initData(int barCount, int rowCount){
+	public void initData(int barCount, int rowCount, JSONObject specific){
 		Properties s = new Properties();
 
 		try {
@@ -118,8 +116,8 @@ public class BarVisualization implements Visualization {
 			l.error("Could not load Settingsfile!", e);
 		}
 
-		barIndexDistribution = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.gfx.viz.barIndexDistribution", "1"));
-		barScaleType		 = Integer.parseInt(s.getProperty("org.nZeloT.ledviz2.gfx.viz.barScaleType", "1"));
+		barIndexDistribution = specific.optInt("barIndexDistribution", 1);
+		barScaleType		 = specific.optInt("barScaleType", 1);
 
 		if(barIndexDistribution > 1 || barIndexDistribution < 0)
 			barIndexDistribution = 1;

@@ -1,0 +1,61 @@
+{
+	"visualization" : {
+	
+		"renderer" : {
+			"resX" : 1024,
+			"resY" : 720,
+			"fullscreen" : false,
+			
+			"specific" : {
+				"LEDSize" : 8,
+				"BaseColor" : [ 255, 165, 0 ]
+			}
+		},
+	
+		"visualizer" : {
+			"class" : "com.nzelot.ledviz2.gfx.viz.BarVisualization",
+			"specific" : {
+				"barScaleType" : 2,
+				"barIndexDistribution" : 0
+			}
+		}
+	},
+	
+	"player" : {
+		"class" : "com.nzelot.ledviz2.sound.player.attached.MPDPlayer",
+		
+		"specific" : {
+			"provider" : {
+				"class" : "com.nzelot.ledviz2.sound.player.attached.provider.BASSAttachedSoundProvider",
+				"specific" : {
+				}
+			},
+			
+			"server" : {
+				"ip" : "192.168.102.2",
+				"port" : 6600
+			},
+			
+			"updInterval" : 25
+		}
+	},
+	
+	"ui" : {
+		"list" : {
+			"class"  : "com.nzelot.ledviz2.ui.elements.FileBrowser",
+			"specific" : {
+				"path"   : "D:/Musik/",
+				"filter" : [ "mp3", "mp4", "m4a" ]
+			}
+		}	
+	},
+	
+	"overall" : {
+		"timeOuts" : {
+			"key" : 10,
+			"mouse" : 10,
+			"mouseHide" : 420
+		},
+		"tragetFPS" : 60
+	}
+}

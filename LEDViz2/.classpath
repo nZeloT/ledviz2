@@ -33,6 +33,13 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/sfl4j/slf4j-api-1.7.6.jar"/>
 	<classpathentry kind="lib" path="lib/sfl4j/slf4j-simple-1.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/aopalliance/aopalliance-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-guice/guice-4.0-beta5.jar"/>
+	<classpathentry kind="lib" path="lib/javampd/javampd-5.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/javax.inject/javax.inject.jar"/>
+	<classpathentry kind="lib" path="lib/musicbrainz/musicbrainzws2-java-3.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jdom/jdom-1.1.3.jar"/>
+	<classpathentry kind="lib" path="lib/org.json/json-20141113.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

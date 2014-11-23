@@ -22,49 +22,49 @@ import fm.last.musicbrainz.coverart.impl.DefaultCoverArtArchiveClient;
 
 public class JAudioTaggerFetcher implements METADataFetcher {
 
-    @Override
-    public METAData fetch(String fn) {
-	METAData meta = new METAData(fn);
-	AudioFile f = null;
+	@Override
+	public METAData fetch(String fn) {
+		METAData meta = new METAData(fn);
+		AudioFile f = null;
 
-	try {
-	    f = AudioFileIO.read(new File(fn));
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-
-	Tag t = f.getTag();
-
-	meta.setArtist(t.getFirst(FieldKey.ARTIST));
-	meta.setAlbum(t.getFirst(FieldKey.ALBUM));
-	meta.setTitle(t.getFirst(FieldKey.TITLE));
-
-	try {
-	    if(t.getFirstArtwork() != null && t.getFirstArtwork().getBinaryData() != null)
-		meta.setAlbumCover(ImageIO.read(new ByteArrayInputStream(t.getFirstArtwork().getBinaryData())));
-	} catch (IOException e1) {
-	    e1.printStackTrace();
-	}
-	
-	if(meta.getAlbumCover() == null && !t.getFirst(FieldKey.MUSICBRAINZ_DISC_ID).isEmpty()){
-	    CoverArtArchiveClient client = new DefaultCoverArtArchiveClient();
-	    UUID mbid = UUID.fromString(t.getFirst(FieldKey.MUSICBRAINZ_DISC_ID));
-	    
-	    BufferedImage img = null;
-
-	    try {
-		CoverArt coverArt = client.getByMbid(mbid);
-		if (coverArt != null && coverArt.getFrontImage() != null) {
-		    img = ImageIO.read(coverArt.getFrontImage().getImage());
+		try {
+			f = AudioFileIO.read(new File(fn));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
 
-	    meta.setAlbumCover(img);
+		Tag t = f.getTag();
+
+		meta.setArtist(t.getFirst(FieldKey.ARTIST));
+		meta.setAlbum(t.getFirst(FieldKey.ALBUM));
+		meta.setTitle(t.getFirst(FieldKey.TITLE));
+
+		try {
+			if(t.getFirstArtwork() != null && t.getFirstArtwork().getBinaryData() != null)
+				meta.setAlbumCover(ImageIO.read(new ByteArrayInputStream(t.getFirstArtwork().getBinaryData())));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		if(meta.getAlbumCover() == null && !t.getFirst(FieldKey.MUSICBRAINZ_DISC_ID).isEmpty()){
+			CoverArtArchiveClient client = new DefaultCoverArtArchiveClient();
+			UUID mbid = UUID.fromString(t.getFirst(FieldKey.MUSICBRAINZ_DISC_ID));
+
+			BufferedImage img = null;
+
+			try {
+				CoverArt coverArt = client.getByMbid(mbid);
+				if (coverArt != null && coverArt.getFrontImage() != null) {
+					img = ImageIO.read(coverArt.getFrontImage().getImage());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			meta.setAlbumCover(img);
+		}
+
+		return meta;
 	}
-
-	return meta;
-    }
 
 }

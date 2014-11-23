@@ -1,22 +1,20 @@
-package com.nzelot.ledviz2.sound.player.attatched;
+package com.nzelot.ledviz2.sound.player.attached;
+
+import org.json.JSONObject;
 
 import com.apple.itunes.com.ClassFactory;
 import com.apple.itunes.com.IiTunes;
 import com.nzelot.ledviz2.sound.meta.METADataFetcher;
 import com.nzelot.ledviz2.sound.meta.fetcher.ITunesTagFetcher;
-import com.nzelot.ledviz2.sound.player.AttatchedPlayer;
+import com.nzelot.ledviz2.sound.player.AttachedPlayer;
 
-public class ITunesPlayer extends AttatchedPlayer {
+public class ITunesPlayer extends AttachedPlayer {
 
 	private IiTunes itunes;
 	
-	public ITunesPlayer(Class<?> provider) {
-		super(provider);
-	}
-	
 	@Override
-	public boolean init(int bands, int updateInterval) {
-		super.init(bands, updateInterval);
+	public boolean init(JSONObject specific) {
+		super.init(specific);
 		
 		itunes = ClassFactory.createiTunesApp();
 
@@ -24,20 +22,18 @@ public class ITunesPlayer extends AttatchedPlayer {
 	}
 
 	@Override
-	public void startPlayback() {
+	public void attachedStartPlayback() {
 		itunes.play();
-		playing = true;
 	}
 
 	@Override
-	protected void pausePlayback() {
-		playing = false;
+	protected void attachedPausePlayback() {
 		itunes.pause();
 	}
 
 	@Override
-	public void stop() {
-		if(playing)
+	public void attachedStopPlayback() {
+		if(isPlaying())
 			pause();
 		if(isLoaded()){
 			itunes.stop();
@@ -59,8 +55,4 @@ public class ITunesPlayer extends AttatchedPlayer {
 		return new ITunesTagFetcher();
 	}
 
-	@Override
-	public boolean isPlaying() {
-		return false;
-	}
 }
