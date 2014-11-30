@@ -25,7 +25,7 @@ import com.nzelot.ledviz2.sound.Player;
 import com.nzelot.ledviz2.sound.meta.METAData;
 import com.nzelot.ledviz2.ui.Layer;
 import com.nzelot.ledviz2.ui.UI;
-import com.nzelot.ledviz2.ui.elements.FileBrowser;
+import com.nzelot.ledviz2.ui.elements.Browser;
 import com.nzelot.ledviz2.ui.elements.ImageButton;
 import com.nzelot.ledviz2.ui.elements.PopOver;
 import com.nzelot.ledviz2.ui.elements.ProgressBar;
@@ -42,10 +42,7 @@ public class LEDViz2{
 	private int TARGET_FPS;
 
 	private int KEY_TIME_OUT;
-	private int MOUSE_KEY_OUT;
 	private int MOUSE_HIDE_OUT;
-
-	private String START_PATH;
 
 	private int keyboardDelay;
 
@@ -59,7 +56,7 @@ public class LEDViz2{
 	private UI ui;
 	private ProgressBar progress;
 	private Text text;
-	private FileBrowser list;
+	private Browser list;
 	private PopOver overlay;
 	private ImageButton btnPlay;
 
@@ -122,10 +119,7 @@ public class LEDViz2{
 		FULL_SCREEN		= ConfigParser.get().visualization().getJSONObject("renderer").optBoolean("fullscreen", false);
 		TARGET_FPS		= ConfigParser.get().overall().optInt("targetFPS", 60);
 		KEY_TIME_OUT	= ConfigParser.get().overall().getJSONObject("timeOuts").optInt("key",10);
-		MOUSE_KEY_OUT	= ConfigParser.get().overall().getJSONObject("timeOuts").optInt("mouse",10);
 		MOUSE_HIDE_OUT	= ConfigParser.get().overall().getJSONObject("timeOuts").optInt("mouseHide",420);
-		
-//		START_PATH     = s.getProperty("org.nZeloT.ledviz2.StartPath", System.getProperty("user.dir"));
 		
 		//Config walkthrough
 		//1. Visualization
@@ -154,6 +148,7 @@ public class LEDViz2{
 		clazz				= 	cLoader.loadClass(className);
 		player = (Player)clazz.newInstance();
 		player.init(specific);
+		player.setUpdate(u -> updateSongUI(u));
 
 		//3. UI
 		ui = new UI();
@@ -164,12 +159,11 @@ public class LEDViz2{
 		overlay = new PopOver((Display.getWidth()-100)/2, (Display.getHeight()-100)/2, 100, 100, 60, "res/textures/pause");
 		btnPlay = new ImageButton((int) (Display.getWidth()/2.0f-25), Display.getHeight()-70-25, 50, 50, "res/textures/play_alpha");
 
-//		className			=	ConfigParser.get().ui().getJSONObject("list").getString("class");
-//		specific			=	ConfigParser.get().ui().getJSONObject("list").getJSONObject("specific");
-//		clazz				= 	cLoader.loadClass(className);
-		list = new FileBrowser(10, 5, 350, Display.getHeight()-100, START_PATH, new FileBrowser.FileFilter("mp3", "mp4", "m4a"));
-//		list = (Browser)clazz.newInstance();
-//		list.init(10, 5, 350, Display.getHeight()-100, specific);
+		className			=	ConfigParser.get().ui().getJSONObject("list").getString("class");
+		specific			=	ConfigParser.get().ui().getJSONObject("list").getJSONObject("specific");
+		clazz				= 	cLoader.loadClass(className);
+		list = (Browser)clazz.newInstance();
+		list.init(10, 5, 350, Display.getHeight()-100, specific);
 		
 		
 		ui.addElements(new Layer(progress, btnPlay, text, overlay), new Layer(list));
@@ -234,20 +228,11 @@ public class LEDViz2{
 						break;
 
 					case Keyboard.KEY_RIGHT:
-						if(ui.getLayer(1).isVisible() && list.isFileSelected()){
-							player.load(list.getSelection());
-							METAData meta = player.getMetaData();
-							text.setText(  (meta.getTitle().isEmpty() ? meta.getFileName() : (meta.getTitle() + (meta.getArtist().isEmpty() ? "" : (" by " + meta.getArtist() + (meta.getAlbum().isEmpty() ? "" : " from " + meta.getAlbum()) ) ) ))  );
-
-							if(meta.getAlbumCover() != null){
-								matrix.setColor(ColorUtils.generate(matrix.getMatrix()[0].length, matrix.getMatrix().length, meta.getAlbumCover()));
-							}else{
-								matrix.setColorToDef();
-							}
-
-							updateColor();
+						if(ui.getLayer(1).isVisible() && list.isPlayableSelected()){
+							player.playSong(list.getSelection());
+							
 						}else{
-							list.enterDir();
+							list.enterSelection();
 						}
 						break;
 
@@ -274,12 +259,6 @@ public class LEDViz2{
 			keyboardDelay--;
 	}
 
-	private void updateColor(){
-		progress.setBgColor(matrix.getMatrix()[matrix.getMatrix().length-1][matrix.getMatrix()[0].length/2].getCol().darker());
-		list.setBgColor(progress.getBgColor());
-		btnPlay.setBgColor(progress.getBgColor());
-	}
-
 	private void update(){
 		handleInput();
 
@@ -287,6 +266,26 @@ public class LEDViz2{
 			viz.aplyFFTData(matrix, player.getSpectrumData());
 
 		progress.setProgress((player.getPosition()+0d) / player.getDuration());
+	}
+	
+	public void updateSongUI(METAData meta){
+		text.setText(  (meta.getTitle().isEmpty() ? meta.getFileName() : (meta.getTitle() + (meta.getArtist().isEmpty() ? "" : (" by " + meta.getArtist() + (meta.getAlbum().isEmpty() ? "" : " from " + meta.getAlbum()) ) ) ))  );
+
+		if(meta.getAlbumCover() != null){
+			matrix.setColor(ColorUtils.generate(matrix.getMatrix()[0].length, matrix.getMatrix().length, meta.getAlbumCover()));
+		}else{
+			matrix.setColorToDef();
+		}
+		
+		list.enterSelection();
+
+		updateColor();
+	}
+	
+	private void updateColor(){
+		progress.setBgColor(matrix.getMatrix()[matrix.getMatrix().length-1][matrix.getMatrix()[0].length/2].getCol().darker());
+		list.setBgColor(progress.getBgColor());
+		btnPlay.setBgColor(progress.getBgColor());
 	}
 
 	private void draw(){

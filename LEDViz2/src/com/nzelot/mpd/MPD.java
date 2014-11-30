@@ -1,26 +1,32 @@
 package com.nzelot.mpd;
 
+import com.nzelot.ledviz2.config.ConfigParser;
+
 
 
 public class MPD {
 	private static MPD inst = null;
-	private org.bff.javampd.MPD mpd = null;
+	private static String libLoc;
+	private org.bff.javampd.server.MPD mpd = null;
 	private boolean connected;
-		
+	
 	private MPD() {}
 	
-	public static org.bff.javampd.MPD getMPD() {
-		return getMPD(true);
-	}
-	
-	public static org.bff.javampd.MPD getMPD(boolean autoConnect) {
-		if(!getConnector().isConnected() && autoConnect)
+	public static org.bff.javampd.server.MPD getMPD() {
+		if(!getConnector().isConnected())
 			getConnector().connect();
 			
 		return getConnector().getMpd();
 	}
 	
-	public static MPD getConnector(){
+	public static String getLibLoc(){
+		if(!getConnector().isConnected())
+			getConnector().connect();
+		
+		return libLoc;
+	}
+	
+	private static MPD getConnector(){
 		if(inst == null){
 			inst = new MPD();
 		}
@@ -30,8 +36,14 @@ public class MPD {
 	
 	public void connect(){
 		try {
-			mpd = new org.bff.javampd.MPD.Builder().server("192.168.2.102").port(6600).build();
+			
+			String ip	=	ConfigParser.get().special().getJSONObject("mpd_server").optString("ip", "localhost");
+			int port	=	ConfigParser.get().special().getJSONObject("mpd_server").optInt("port", 6600);
+			libLoc		= ConfigParser.get().special().getJSONObject("mpd_server").getString("mpdLibLoc");
+						
+			mpd = new org.bff.javampd.server.MPD.Builder().server(ip).port(port).build();
 			connected = true;
+			
 		} catch (Exception e) {
 			connected = false;
 			e.printStackTrace();
@@ -52,7 +64,7 @@ public class MPD {
 		return connected;
 	}
 	
-	public synchronized org.bff.javampd.MPD getMpd() {
+	public synchronized org.bff.javampd.server.MPD getMpd() {
 		return mpd;
 	}
 }

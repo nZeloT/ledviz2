@@ -60,4 +60,8 @@ public class ConfigParser {
 	public JSONObject overall(){
 		return root.getJSONObject("overall");
 	}
+	
+	public JSONObject special(){
+		return root.getJSONObject("special");
+	}
 }

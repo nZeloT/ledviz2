@@ -55,4 +55,9 @@ public class ITunesPlayer extends AttachedPlayer {
 		return new ITunesTagFetcher();
 	}
 
+	@Override
+	protected void attachedPlaySong() {
+		//TODO: implement
+	}
+
 }

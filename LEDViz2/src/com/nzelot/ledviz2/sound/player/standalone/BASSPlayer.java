@@ -101,8 +101,8 @@ public class BASSPlayer extends StandalonePlayer {
 		HSTREAM stream = null; 
 		HMUSIC music = null;
 
-		if((stream = BASS_StreamCreateFile(false, path, 0, 0, BASS_SAMPLE_LOOP)) == null
-				&&  (music = BASS_MusicLoad(false, path, 0, 0, BASS_MUSIC_RAMP | BASS_SAMPLE_LOOP, 0)) == null) {
+		if((stream = BASS_StreamCreateFile(false, url, 0, 0, BASS_SAMPLE_LOOP)) == null
+				&&  (music = BASS_MusicLoad(false, url, 0, 0, BASS_MUSIC_RAMP | BASS_SAMPLE_LOOP, 0)) == null) {
 			l.error("Can't play file");
 			return false; // Can't load the file
 		}
@@ -111,7 +111,9 @@ public class BASSPlayer extends StandalonePlayer {
 
 		loaded = true;
 
-		l.debug("Loaded " + path);
+		l.debug("Loaded " + url);
+		
+		play();
 
 		return true;
 	}

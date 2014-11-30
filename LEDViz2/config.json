@@ -2,9 +2,9 @@
 	"visualization" : {
 	
 		"renderer" : {
-			"resX" : 1024,
-			"resY" : 720,
-			"fullscreen" : false,
+			"resX" : 1920,
+			"resY" : 1080,
+			"fullscreen" : true,
 			
 			"specific" : {
 				"LEDSize" : 8,
@@ -31,18 +31,14 @@
 				}
 			},
 			
-			"server" : {
-				"ip" : "192.168.102.2",
-				"port" : 6600
-			},
-			
-			"updInterval" : 25
+			"updInterval" 		: 25,
+			"mpdUpdateInterval" : 500
 		}
 	},
 	
 	"ui" : {
 		"list" : {
-			"class"  : "com.nzelot.ledviz2.ui.elements.FileBrowser",
+			"class"  : "com.nzelot.ledviz2.ui.elements.browser.MPDBrowser",
 			"specific" : {
 				"path"   : "D:/Musik/",
 				"filter" : [ "mp3", "mp4", "m4a" ]
@@ -53,9 +49,16 @@
 	"overall" : {
 		"timeOuts" : {
 			"key" : 10,
-			"mouse" : 10,
 			"mouseHide" : 420
 		},
-		"tragetFPS" : 60
+		"tragetFPS" : 40
+	},
+	
+	"special" : {
+		"mpd_server" : {
+				"ip" 		: "192.168.2.102",
+				"port" 		: 6600,
+				"mpdLibLoc" : "D:/Musik/"
+			}
 	}
 }

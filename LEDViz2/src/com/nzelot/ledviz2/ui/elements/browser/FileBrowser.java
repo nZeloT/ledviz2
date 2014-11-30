@@ -1,43 +1,42 @@
-package com.nzelot.ledviz2.ui.elements;
+package com.nzelot.ledviz2.ui.elements.browser;
 
-import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
 
-public class FileBrowser extends UIElement {
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-	private List<String> content;
+import com.nzelot.ledviz2.sound.meta.METAData;
+import com.nzelot.ledviz2.ui.elements.Browser;
 
-	private Text currentDir;
+public class FileBrowser extends Browser {
 
 	private String curDirPath;
 
-	private FileFilter filter;
-
-	public FileBrowser(int x, int y, int width, int heigth, String startPath, FileFilter filter) {
-		super(x, y, width, heigth);
-
-		content = new List<String>(x, y+40, width, heigth-40, 15);
-		currentDir = new Text(x, y, 18);
-
-		this.filter = filter;
-
+	public void init(JSONObject specific){
+		
+		String startPath	=	specific.getString("path");
+		JSONArray filter	=	specific.getJSONArray("filter");
+		
+		this.filter = new Filter();
+		for(int i = 0; i < filter.length(); i++){
+			String end = filter.getString(i);
+			if(!end.equals("NO_FILTER"))
+				this.filter.addEnd(end);
+			else{
+				this.filter = Filter.NO_FILTER;
+				break;
+			}
+		}
+		
 		enterDir(startPath);
-	}
-
-	public void increseSelectedIdx(){
-		content.increseSelectedIdx();
-	}
-
-	public void decreaseSelectedIdx(){
-		content.decreaseSelectedIdx();
 	}
 
 	public String getSelection(){
 		return curDirPath + "/" + content.getSelectedEntry();
 	}
 
-	public void enterDir(){
+	public void enterSelection(){
 		String selDir = content.getSelectedEntry();
 
 		//is it a ".." entry?
@@ -83,27 +82,20 @@ public class FileBrowser extends UIElement {
 				if(filter.check(s.substring(s.lastIndexOf(".")+1)))
 					content.addEntries(s);
 
-			currentDir.setText(dir.replace("\\", "/"));
+			heading.setText(dir.replace("\\", "/"));
 			curDirPath = f.getAbsolutePath();
 		}else{
 			//Root
 			for(File s : File.listRoots())
 				content.addEntries(s.getAbsolutePath());
-			currentDir.setText("Root");
+			heading.setText("Root");
 			curDirPath = "";
 		}
 
 		content.setSelectedIdx(0);
 	}
 
-	@Override
-	public void setBgColor(Color bgColor) {
-		super.setBgColor(bgColor);
-		if(content != null)
-			content.setBgColor(bgColor);
-	}
-
-	public boolean isFileSelected(){
+	public boolean isPlayableSelected(){
 		String selDir = content.getSelectedEntry();
 
 		if(selDir.equals("..")){
@@ -116,49 +108,11 @@ public class FileBrowser extends UIElement {
 				return true;
 		}
 	}
-
+	
 	@Override
-	public void draw() {
-		currentDir.draw();
-		content.draw();
+	public void updateSelection(METAData d) {
+		//Not required here
+		//at least at the moment
 	}
-
-	public FileFilter getFilter() {
-		return filter;
-	}
-
-	public void setFilter(FileFilter filter) {
-		this.filter = filter;
-	}
-
-	public static class FileFilter {
-		public static final FileFilter NO_FILTER = new FileFilter(){
-			public boolean check(String end) {
-				return true;
-			};
-		};
-
-		private String filter;
-
-		private FileFilter(){}
-
-		public FileFilter(String... end) {
-			filter = "";
-			addEnd(end);
-		}
-
-		public void addEnd(String... end){
-			if(end != null && end.length > 0)
-				for(String s : end)
-					filter += s + ";";
-		}
-
-		public String[] getEnds(){
-			return filter.split(";");
-		}
-
-		public boolean check(String end){
-			return filter.contains(end);
-		}
-	}
+	
 }

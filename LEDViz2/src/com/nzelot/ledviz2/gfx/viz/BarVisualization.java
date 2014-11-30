@@ -1,19 +1,13 @@
 package com.nzelot.ledviz2.gfx.viz;
 
-import java.io.FileInputStream;
-import java.util.Properties;
+import java.util.Arrays;
 
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.nzelot.ledviz2.LEDViz2;
 import com.nzelot.ledviz2.gfx.LED;
 import com.nzelot.ledviz2.gfx.LEDMatrix;
 
 public class BarVisualization implements Visualization {
-
-	private final Logger l = LoggerFactory.getLogger(LEDViz2.class);
 
 	private static final int HISTORY_SIZE = 10;
 
@@ -74,17 +68,17 @@ public class BarVisualization implements Visualization {
 					barHeight = rowsV;
 				if(barHeight < 0)
 					barHeight = 0;
-
+				
 				fftHistory[rotator][barIndex] = barHeight;
 				setBarValue(matrix, barIndex, average(barIndex));
-
-				rotator = ++rotator % HISTORY_SIZE;
-
+				
 				barHeight = 0;
 				barIndex++;
 			}
 
 		}
+		
+		rotator = ++rotator % HISTORY_SIZE;
 	}
 
 	private void setBarValue(LEDMatrix matrix, int bar, double v){
@@ -108,14 +102,6 @@ public class BarVisualization implements Visualization {
 	}
 
 	public void initData(int barCount, int rowCount, JSONObject specific){
-		Properties s = new Properties();
-
-		try {
-			s.load(new FileInputStream("settings.properties"));
-		} catch (Exception e) {
-			l.error("Could not load Settingsfile!", e);
-		}
-
 		barIndexDistribution = specific.optInt("barIndexDistribution", 1);
 		barScaleType		 = specific.optInt("barScaleType", 1);
 
@@ -134,6 +120,7 @@ public class BarVisualization implements Visualization {
 
 		rowsV = rowCount;
 		cols = barCount;
+		
 		barIndexMax = new int[cols];
 
 		for(int i = 1; i < barIndexMax.length; i++){
@@ -143,6 +130,8 @@ public class BarVisualization implements Visualization {
 			}else{
 				//Logarithmic Bars
 				barIndexMax[i] = (int)((1 - Math.log(cols - i)/Math.log(cols)) * 1024);
+				if(barIndexMax[i-1] >= barIndexMax[i])
+					barIndexMax[i] = barIndexMax[i-1]+1;
 			}
 		}
 	}

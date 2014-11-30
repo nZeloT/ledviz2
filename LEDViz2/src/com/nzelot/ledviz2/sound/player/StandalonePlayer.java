@@ -22,26 +22,28 @@ public abstract class StandalonePlayer extends Player {
 
 	protected boolean hasNewData;
 
-	protected String path;
-	
-	public boolean load(String url){
-		path = new File(url).getAbsolutePath();
+	@Override
+	public boolean playSong(String url){
+		this.url = new File(url).getAbsolutePath();
 
 		if(load()){
-			meta = getFetcher().fetch(path);
+			updateMetaData();
 			return true;
 		}else
 			return false;
 	}
 
+	@Override
 	public boolean hasNewData(){
 		return hasNewData;
 	}
 
+	@Override
 	public boolean isLoaded() {
 		return loaded;
 	}
 
+	@Override
 	public boolean isPlaying() {
 		return playing;
 	}
