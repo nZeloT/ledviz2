@@ -1,7 +1,5 @@
 package com.nzelot.ledviz2.gfx.viz;
 
-import java.util.Arrays;
-
 import org.json.JSONObject;
 
 import com.nzelot.ledviz2.gfx.LED;
@@ -55,7 +53,6 @@ public class BarVisualization implements Visualization {
 				fftBucketHeight = (newData[0][i] * 9) * rowsV;
 				break;
 			}
-
 
 			if (barHeight < fftBucketHeight)
 				barHeight = (int)fftBucketHeight;

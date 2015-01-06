@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.sound.meta.fetcher;
+package com.nzelot.ledviz2.meta.fetcher;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -7,12 +7,12 @@ import java.util.Map;
 import com.apple.itunes.com.ClassFactory;
 import com.apple.itunes.com.IITTrack;
 import com.apple.itunes.com.IiTunes;
-import com.nzelot.ledviz2.sound.meta.METADataFetcher;
+import com.nzelot.ledviz2.meta.METADataFetcher;
 
 public class ITunesTagFetcher extends METADataFetcher {
 
 	@Override
-	protected Map<String, String> fetchMetaStrings(String fn) {
+	protected Map<String, String> fetchMetaStrings() {
 		Map<String, String> data = new HashMap<String, String>();
 
 		IiTunes itunes = ClassFactory.createiTunesApp();

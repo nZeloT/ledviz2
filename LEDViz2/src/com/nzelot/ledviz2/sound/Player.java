@@ -2,52 +2,60 @@ package com.nzelot.ledviz2.sound;
 
 import org.json.JSONObject;
 
-import com.nzelot.ledviz2.sound.meta.METAData;
-import com.nzelot.ledviz2.sound.meta.METADataFetcher;
-import com.nzelot.ledviz2.sound.meta.METADataFetcherUpdateEvent;
+import com.nzelot.ledviz2.LEDViz2;
+import com.nzelot.ledviz2.meta.METADataFetcher;
 
 
 public abstract class Player {
 
-	private METAData meta;
-	private PlayerUpdateEvent update;
-	
-	protected String url;
-	
+	private boolean running;
+	private AttachedSoundProvider player;
 
-	public abstract boolean init(JSONObject specific);
-	public abstract boolean exit();
-	public abstract boolean playSong(String url);
-	public abstract void stop();
-	public abstract boolean hasNewData();
-	public abstract boolean isLoaded();
-	public abstract boolean isPlaying();
-	public abstract PlayerType getPlayerType();
-	public abstract float[] getSpectrumData();
-	
-	protected abstract boolean load();
-	protected abstract void startPlayback();
-	protected abstract void pausePlayback();
 	protected abstract long duration();
 	protected abstract long position();
-	protected abstract METADataFetcher getFetcher();
+	
+	public abstract METADataFetcher getFetcher();
+	
+	public boolean init(JSONObject specific){
+		try {
+			int updateInterval	=	specific.optInt("updInterval", 25);
+			String className	=	specific.getJSONObject("provider").getString("class");
+			JSONObject provider	=	specific.getJSONObject("provider").getJSONObject("specific");
+			Class<?> clazz		= 	LEDViz2.class.getClassLoader().loadClass(className);
+			player = (AttachedSoundProvider) clazz.newInstance();
 
-	public Player() {
-		meta = new METAData("");
+			if(!player.init(updateInterval, provider))
+				return false;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		player.load();
+		running = false;
+
+		return true;
 	}
 	
-	public void play(){
-		if(isPlaying() || !isLoaded())
-			return;
-		startPlayback();
+	public boolean exit(){
+		stop();
+		return player.exit();
 	}
 	
-	public void pause(){
-		if(!isPlaying() || !isLoaded())
-			return;
-		pausePlayback();
+	public void stop(){
+		player.stop();
+		running = false;
 	}
-
+	
+	public void start(){
+		if(isRunning() || !isLoaded())
+			return;
+		
+		player.start();
+		running = true;
+	}
+	
 	public long getDuration(){
 		if(!isLoaded())
 			return -1;
@@ -62,42 +70,19 @@ public abstract class Player {
 			return position();
 	}
 
-	public void setUpdate(PlayerUpdateEvent update) {
-		this.update = update;
+	public boolean hasNewData(){
+		return player.hasNewData();
 	}
 	
-	protected void firePlayUpdateEvent(){
-		update.update(getMETA());
+	public boolean isLoaded(){
+		return player.isLoaded();
 	}
 	
-	protected void updateMetaData(){
-		getFetcher().init(url, new METADataFetcherUpdateEvent() {
-			@Override
-			public void update(METAData d) {
-				update.update(d);
-				setMETAData(d);
-			}
-		});		
+	public boolean isRunning(){
+		return running;
 	}
 	
-	private void setMETAData(METAData d){
-		synchronized (meta) {
-			meta = new METAData(d);
-		}
-	}
-	
-	private METAData getMETA(){
-		METAData d = null;
-		synchronized (meta) {
-			d = new METAData(meta);
-		}
-		return d;
-	}
-	
-	public METAData getMetaData(){
-		if(!isLoaded())
-			return null;
-		else
-			return getMETA();
+	public float[] getSpectrumData(){
+		return player.getSpectrumData();
 	}
 }

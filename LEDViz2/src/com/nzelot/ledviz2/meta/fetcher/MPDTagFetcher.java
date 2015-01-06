@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.sound.meta.fetcher;
+package com.nzelot.ledviz2.meta.fetcher;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
-import com.nzelot.ledviz2.sound.meta.METADataFetcher;
+import com.nzelot.ledviz2.meta.METADataFetcher;
 
 import fm.last.musicbrainz.coverart.CoverArt;
 import fm.last.musicbrainz.coverart.CoverArtArchiveClient;
@@ -36,7 +36,7 @@ public class MPDTagFetcher extends METADataFetcher {
 	private final Logger l = LoggerFactory.getLogger(MPDTagFetcher.class);
 
 	@Override
-	protected Map<String, String> fetchMetaStrings(String fn) {
+	protected Map<String, String> fetchMetaStrings() {
 		Map<String, String> data = new HashMap<String, String>();
 
 		MPD mpd = com.nzelot.mpd.MPD.getMPD();

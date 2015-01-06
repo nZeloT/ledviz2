@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.sound.player.attached.provider;
+package com.nzelot.ledviz2.sound.provider;
 
 import static jouvieje.bass.Bass.BASS_ChannelGetData;
 import static jouvieje.bass.Bass.BASS_Free;
@@ -27,7 +27,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.nzelot.ledviz2.sound.player.attached.AttachedSoundProvider;
+import com.nzelot.ledviz2.sound.AttachedSoundProvider;
 
 public class BASSAttachedSoundProvider implements AttachedSoundProvider {
 

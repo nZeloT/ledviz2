@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.sound.player.attached;
+package com.nzelot.ledviz2.sound;
 
 import org.json.JSONObject;
 

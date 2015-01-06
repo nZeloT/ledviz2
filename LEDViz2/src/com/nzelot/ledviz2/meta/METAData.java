@@ -1,4 +1,4 @@
-package com.nzelot.ledviz2.sound.meta;
+package com.nzelot.ledviz2.meta;
 
 import java.awt.image.BufferedImage;
 

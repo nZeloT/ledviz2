@@ -49,8 +49,8 @@ public class ConfigParser {
 		return root.getJSONObject("visualization");
 	}
 	
-	public JSONObject player(){
-		return root.getJSONObject("player");
+	public JSONObject controller(){
+		return root.getJSONObject("controller");
 	}
 	
 	public JSONObject ui(){
